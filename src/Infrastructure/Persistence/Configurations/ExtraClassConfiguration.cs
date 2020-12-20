@@ -26,10 +26,6 @@ namespace CrouseMath.Infrastructure.Persistence.Configurations
                 .IsRequired()
                 .HasColumnType("money");
 
-            builder.HasOne(e => e.Teacher)
-                .WithMany()
-                .HasForeignKey(e => e.Id);
-
             builder.HasOne(e => e.Subject)
                 .WithMany()
                 .HasForeignKey(e => e.Id);

@@ -10,7 +10,7 @@ namespace CrouseMath.Application.ExtraClasses.Queries.GetExtraClass
 {
     public class GetExtraClassQuery: IRequest<ExtraClassViewModel>
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
     }
 
     public class GetExtraClassQueryHandler : IRequestHandler<GetExtraClassQuery, ExtraClassViewModel>

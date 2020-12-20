@@ -11,16 +11,17 @@ namespace CrouseMath.Application.Bookings.Commands.CreateBooking
     public class CreateBookingCommand: IRequest<long>
     {
         public long ExtraClassId { get; set; }
-        public long StudentId { get; set; }
     }
     
     public class CreateBookingCommandHandler : IRequestHandler<CreateBookingCommand, long>
     {
         private readonly IApplicationDbContext _context;
+        private readonly ICurrentUserService _currentUserService;
 
-        public CreateBookingCommandHandler(IApplicationDbContext context)
+        public CreateBookingCommandHandler(IApplicationDbContext context, ICurrentUserService currentUserService)
         {
             _context = context;
+            _currentUserService = currentUserService;
         }
 
         public async Task<long> Handle(CreateBookingCommand request, CancellationToken cancellationToken)
@@ -32,9 +33,9 @@ namespace CrouseMath.Application.Bookings.Commands.CreateBooking
                 throw new NotFoundException(nameof(ExtraClass), request.ExtraClassId);
             }
 
-            if (entity.Bookings.Any(b => b.StudentId == request.StudentId))
+            if (entity.Bookings.Any(b => b.UserId == _currentUserService.UserId))
             {
-                throw new DoubleBookingException(nameof(ExtraClass), request.ExtraClassId, request.StudentId);
+                throw new DoubleBookingException(nameof(ExtraClass), request.ExtraClassId, _currentUserService.UserId);
             }
 
             if (entity.IsClassFull)
@@ -45,7 +46,7 @@ namespace CrouseMath.Application.Bookings.Commands.CreateBooking
             var booking = new Booking
             {
                 ExtraClassId = entity.Id,
-                StudentId = request.StudentId,
+                UserId = _currentUserService.UserId,
                 BookingPrice = entity.Price,
                 Paid = false
             };

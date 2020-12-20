@@ -4,6 +4,6 @@ namespace CrouseMath.Application.Bookings.Queries.GetBookingList
 {
     public class BookingListViewModel
     {
-        public IEnumerable<BookingLookup> Bookings { get; set; }
+        public IEnumerable<BookingLookupDto> Bookings { get; set; }
     }
 }

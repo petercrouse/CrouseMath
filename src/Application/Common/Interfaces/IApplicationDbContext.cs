@@ -7,10 +7,8 @@ namespace CrouseMath.Application.Common.Interfaces
 {
     public interface IApplicationDbContext
     {
-        DbSet<Student> Students { get; set; }
         DbSet<Booking> Bookings { get; set; }
         DbSet<ExtraClass> ExtraClasses { get; set; }
-        DbSet<Teacher> Teachers { get; set; }
         DbSet<Subject> Subjects { get; set; }
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     }

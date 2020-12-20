@@ -4,7 +4,7 @@ using CrouseMath.Application.Subjects.Commands.CreateSubject;
 using CrouseMath.Domain.Entities;
 using FluentAssertions;
 using NUnit.Framework;
-
+using System.Threading.Tasks;
 
 namespace CrouseMath.Application.UnitTests.Subjects.Commands.CreateSubject
 {
@@ -22,15 +22,12 @@ namespace CrouseMath.Application.UnitTests.Subjects.Commands.CreateSubject
         }
 
         [Test]
-        public async void CreateSubjectCommandHandler_ShouldAddSubjectToContext()
+        public async Task CreateSubjectCommandHandler_ShouldAddSubjectToContext()
         {
-            // Arrange
             var command = new CreateSubjectCommand{Name = "StaffLogic"};
 
-            // Act
             var subjectId = await SendAsync(command);
 
-            // Assert
             var subject = await FindAsync<Subject>(subjectId);
 
             subject.Name.Should().Be(command.Name); 

@@ -1,45 +1,53 @@
-﻿using System.Threading;
+﻿using System;
 using System.Threading.Tasks;
 using CrouseMath.Application.Common.Exceptions;
+using CrouseMath.Application.IntegrationTests;
+using CrouseMath.Application.Subjects.Commands.CreateSubject;
 using CrouseMath.Application.Subjects.Commands.UpdateSubject;
-using Shouldly;
-using Xunit;
+using CrouseMath.Domain.Entities;
+using FluentAssertions;
+using NUnit.Framework;
 
 namespace CrouseMath.Application.UnitTests.Subjects.Commands.UpdateSubject
 {
-    public class UpdateSubjectCommandTests : CommandTestBase
+    using static Testing;
+
+    public class UpdateSubjectCommandTests : TestBase
     {
-        [Fact]
-        public async Task UpdateSubjectCommand_ShouldThrowNotFoundException()
+        [Test]
+        public void UpdateSubjectCommand_ShouldThrowNotFoundException()
         {
-            //Arrange
-            var sut = new UpdateSubjectCommand.UpdateSubjectCommandHandler(Context);
             var command = new UpdateSubjectCommand
             {
                 Id = 99,
                 Name = "VoidMagic"
             };
 
-            //Assert
-            await Assert.ThrowsAnyAsync<NotFoundException>(async () => await sut.Handle(command, CancellationToken.None));
+            FluentActions.Invoking(() =>
+                SendAsync(command)).Should().Throw<NotFoundException>();
         }
 
-        [Fact]
-        public async Task UpdateCustomerCommand_ShouldUpdateSubject()
+        [Test]
+        public async Task UpdateSubjectCommand_ShouldUpdateSubject()
         {
-            //Arrange
-            var sut = new UpdateSubjectCommand.UpdateSubjectCommandHandler(Context);
+            var userId = await RunAsDefaultUserAsync();
+
+            var subjectId = await SendAsync(new CreateSubjectCommand { Name = "StaffLogic" });
+
             var command = new UpdateSubjectCommand
             {
-                Id = 1,
                 Name = "VoidMagic"
             };
 
-            //Act
-            _ = await sut.Handle(command, CancellationToken.None);
+            await SendAsync(command);
 
-            //Assert
-            Context.Subjects.Find(command.Id).Name.ShouldBe("VoidMagic");
+            var subject = await FindAsync<Subject>(subjectId);
+
+            subject.Name.Should().Be("VoidMagic");
+            subject.LastModifiedBy.Should().NotBeNull();
+            subject.LastModifiedBy.Should().Be(userId);
+            subject.LastModified.Should().NotBeNull();
+            subject.LastModified.Should().BeCloseTo(DateTime.Now, 10000);
         }
     }
 }

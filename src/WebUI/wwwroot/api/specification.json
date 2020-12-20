@@ -6,7 +6,7 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/api/Bookings": {
+    "/api/Bookings/GetAll": {
       "get": {
         "tags": [
           "Bookings"
@@ -24,7 +24,41 @@
             }
           }
         }
-      },
+      }
+    },
+    "/api/Bookings/Get/{id}": {
+      "get": {
+        "tags": [
+          "Bookings"
+        ],
+        "operationId": "Bookings_Get",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookingViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Bookings/Create": {
       "post": {
         "tags": [
           "Bookings"
@@ -57,37 +91,7 @@
         }
       }
     },
-    "/api/Bookings/{id}": {
-      "get": {
-        "tags": [
-          "Bookings"
-        ],
-        "operationId": "Bookings_Get",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BookingViewModel"
-                }
-              }
-            }
-          }
-        }
-      },
+    "/api/Bookings/Update/{id}": {
       "put": {
         "tags": [
           "Bookings"
@@ -131,7 +135,9 @@
             }
           }
         }
-      },
+      }
+    },
+    "/api/Bookings/Delete/{id}": {
       "delete": {
         "tags": [
           "Bookings"
@@ -166,7 +172,7 @@
         }
       }
     },
-    "/api/ExtraClasses": {
+    "/api/ExtraClasses/GetAll": {
       "get": {
         "tags": [
           "ExtraClasses"
@@ -184,7 +190,41 @@
             }
           }
         }
-      },
+      }
+    },
+    "/api/ExtraClasses/Get/{id}": {
+      "get": {
+        "tags": [
+          "ExtraClasses"
+        ],
+        "operationId": "ExtraClasses_Get",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExtraClassViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ExtraClasses/Create": {
       "post": {
         "tags": [
           "ExtraClasses"
@@ -217,37 +257,7 @@
         }
       }
     },
-    "/api/ExtraClasses/{id}": {
-      "get": {
-        "tags": [
-          "ExtraClasses"
-        ],
-        "operationId": "ExtraClasses_Get",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExtraClassViewModel"
-                }
-              }
-            }
-          }
-        }
-      },
+    "/api/ExtraClasses/Update/{id}": {
       "put": {
         "tags": [
           "ExtraClasses"
@@ -291,7 +301,9 @@
             }
           }
         }
-      },
+      }
+    },
+    "/api/ExtraClasses/Delete/{id}": {
       "delete": {
         "tags": [
           "ExtraClasses"
@@ -326,169 +338,7 @@
         }
       }
     },
-    "/api/Students": {
-      "get": {
-        "tags": [
-          "Students"
-        ],
-        "operationId": "Students_GetAll",
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StudentListViewModel"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Students"
-        ],
-        "operationId": "Students_Create",
-        "requestBody": {
-          "x-name": "command",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateStudentCommand"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "204": {
-            "description": ""
-          },
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/Students/{id}": {
-      "get": {
-        "tags": [
-          "Students"
-        ],
-        "operationId": "Students_Get",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StudentViewModel"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Students"
-        ],
-        "operationId": "Students_Update",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 2
-          }
-        ],
-        "requestBody": {
-          "x-name": "command",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateStudentCommand"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "204": {
-            "description": ""
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Students"
-        ],
-        "operationId": "Students_Delete",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": ""
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/Subjects": {
+    "/api/Subjects/GetAll": {
       "get": {
         "tags": [
           "Subjects"
@@ -506,7 +356,41 @@
             }
           }
         }
-      },
+      }
+    },
+    "/api/Subjects/Get/{id}": {
+      "get": {
+        "tags": [
+          "Subjects"
+        ],
+        "operationId": "Subjects_Get",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubjectViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Subjects/Create": {
       "post": {
         "tags": [
           "Subjects"
@@ -538,37 +422,7 @@
         }
       }
     },
-    "/api/Subjects/{id}": {
-      "get": {
-        "tags": [
-          "Subjects"
-        ],
-        "operationId": "Subjects_Get",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SubjectViewModel"
-                }
-              }
-            }
-          }
-        }
-      },
+    "/api/Subjects/Update/{id}": {
       "put": {
         "tags": [
           "Subjects"
@@ -612,174 +466,14 @@
             }
           }
         }
-      },
+      }
+    },
+    "/api/Subjects/Delete/{id}": {
       "delete": {
         "tags": [
           "Subjects"
         ],
         "operationId": "Subjects_Delete",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": ""
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/Teachers": {
-      "get": {
-        "tags": [
-          "Teachers"
-        ],
-        "operationId": "Teachers_GetAll",
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TeacherListViewModel"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Teachers"
-        ],
-        "operationId": "Teachers_Create",
-        "requestBody": {
-          "x-name": "command",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateTeacherCommand"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "204": {
-            "description": ""
-          },
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/Teachers/{id}": {
-      "get": {
-        "tags": [
-          "Teachers"
-        ],
-        "operationId": "Teachers_Get",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TeacherViewModel"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Teachers"
-        ],
-        "operationId": "Teachers_Update",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 2
-          }
-        ],
-        "requestBody": {
-          "x-name": "command",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateTeacherCommand"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "204": {
-            "description": ""
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Teachers"
-        ],
-        "operationId": "Teachers_Delete",
         "parameters": [
           {
             "name": "id",
@@ -820,12 +514,12 @@
             "type": "array",
             "nullable": true,
             "items": {
-              "$ref": "#/components/schemas/BookingLookup"
+              "$ref": "#/components/schemas/BookingLookupDto"
             }
           }
         }
       },
-      "BookingLookup": {
+      "BookingLookupDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -833,7 +527,7 @@
             "type": "integer",
             "format": "int64"
           },
-          "studentName": {
+          "userFullName": {
             "type": "string",
             "nullable": true
           },
@@ -863,21 +557,21 @@
         "properties": {
           "id": {
             "type": "integer",
-            "format": "int32"
+            "format": "int64"
           },
           "extraClassId": {
             "type": "integer",
-            "format": "int32"
+            "format": "int64"
           },
           "extraClassName": {
             "type": "string",
             "nullable": true
           },
-          "studentId": {
-            "type": "integer",
-            "format": "int32"
+          "userId": {
+            "type": "string",
+            "nullable": true
           },
-          "studentName": {
+          "userFullName": {
             "type": "string",
             "nullable": true
           },
@@ -895,10 +589,6 @@
         "additionalProperties": false,
         "properties": {
           "extraClassId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "studentId": {
             "type": "integer",
             "format": "int64"
           }
@@ -1015,8 +705,7 @@
             "format": "date-time"
           },
           "teacherId": {
-            "type": "integer",
-            "format": "int64",
+            "type": "string",
             "nullable": true
           },
           "teacherName": {
@@ -1060,11 +749,6 @@
             "type": "string",
             "format": "date-time"
           },
-          "teacherId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
           "size": {
             "type": "integer",
             "format": "int32"
@@ -1075,7 +759,7 @@
           },
           "subjectId": {
             "type": "integer",
-            "format": "int32"
+            "format": "int64"
           },
           "price": {
             "type": "number",
@@ -1100,8 +784,7 @@
             "format": "date-time"
           },
           "teacherId": {
-            "type": "integer",
-            "format": "int64",
+            "type": "string",
             "nullable": true
           },
           "size": {
@@ -1119,109 +802,6 @@
           "price": {
             "type": "number",
             "format": "double"
-          }
-        }
-      },
-      "StudentListViewModel": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "students": {
-            "type": "array",
-            "nullable": true,
-            "items": {
-              "$ref": "#/components/schemas/StudentLookup"
-            }
-          }
-        }
-      },
-      "StudentLookup": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "name": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "StudentViewModel": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "student": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/StudentDto"
-              }
-            ]
-          }
-        }
-      },
-      "StudentDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "lastName": {
-            "type": "string",
-            "nullable": true
-          },
-          "firstName": {
-            "type": "string",
-            "nullable": true
-          },
-          "email": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "CreateStudentCommand": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "lastName": {
-            "type": "string",
-            "nullable": true
-          },
-          "firstName": {
-            "type": "string",
-            "nullable": true
-          },
-          "email": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "UpdateStudentCommand": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "lastName": {
-            "type": "string",
-            "nullable": true
-          },
-          "firstName": {
-            "type": "string",
-            "nullable": true
-          },
-          "email": {
-            "type": "string",
-            "nullable": true
           }
         }
       },
@@ -1299,109 +879,6 @@
             "format": "int64"
           },
           "name": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "TeacherListViewModel": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "teachers": {
-            "type": "array",
-            "nullable": true,
-            "items": {
-              "$ref": "#/components/schemas/TeacherLookup"
-            }
-          }
-        }
-      },
-      "TeacherLookup": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "name": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "TeacherViewModel": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "teacher": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/TeacherDto"
-              }
-            ]
-          }
-        }
-      },
-      "TeacherDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "lastName": {
-            "type": "string",
-            "nullable": true
-          },
-          "firstName": {
-            "type": "string",
-            "nullable": true
-          },
-          "email": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "CreateTeacherCommand": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "lastName": {
-            "type": "string",
-            "nullable": true
-          },
-          "firstName": {
-            "type": "string",
-            "nullable": true
-          },
-          "email": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "UpdateTeacherCommand": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "lastName": {
-            "type": "string",
-            "nullable": true
-          },
-          "firstName": {
-            "type": "string",
-            "nullable": true
-          },
-          "email": {
             "type": "string",
             "nullable": true
           }

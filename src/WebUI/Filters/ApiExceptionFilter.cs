@@ -21,9 +21,8 @@ namespace CrouseMath.WebUI.Filters
                 { typeof(NotFoundException), HandleNotFoundException },
                 { typeof(ClassIsFullException), HandleClassIsFulleException },
                 { typeof(ClassSizeIsTooSmallForCurrentBookingsException), HandleClassSizeIsTooSmallException },
-                {typeof(DeleteFailureException), HandleDeleteFailureException},
-                {typeof(DoubleBookingException), HandleDoubleBookingException},
-                {typeof(TeacherDoesNotTeachSubjectException), HandleTeacherDoesNotTeachSubjectException}
+                { typeof(DeleteFailureException), HandleDeleteFailureException},
+                { typeof(DoubleBookingException), HandleDoubleBookingException}
             };
         }
 
@@ -92,22 +91,6 @@ namespace CrouseMath.WebUI.Filters
 
             context.ExceptionHandled = true;
         }
-        
-        private void HandleTeacherDoesNotTeachSubjectException(ExceptionContext context)
-        {
-            var exception = context.Exception as TeacherDoesNotTeachSubjectException;
-
-            var details = new ProblemDetails()
-            {
-                Type = "https://tools.ietf.org/html/rfc7231#section-6.5.4",
-                Title = "The teacher does not teach that subject.",
-                Detail = exception.Message
-            };
-
-            context.Result = new BadRequestObjectResult(details);
-
-            context.ExceptionHandled = true;
-        }
 
         private void HandleDoubleBookingException(ExceptionContext context)
         {
@@ -127,7 +110,7 @@ namespace CrouseMath.WebUI.Filters
 
         private void HandleDeleteFailureException(ExceptionContext context)
         {
-            var exception = context.Exception as TeacherDoesNotTeachSubjectException;
+            var exception = context.Exception as DeleteFailureException;
 
             var details = new ProblemDetails()
             {
@@ -143,7 +126,7 @@ namespace CrouseMath.WebUI.Filters
 
         private void HandleClassSizeIsTooSmallException(ExceptionContext context)
         {
-            var exception = context.Exception as TeacherDoesNotTeachSubjectException;
+            var exception = context.Exception as ClassSizeIsTooSmallForCurrentBookingsException;
 
             var details = new ProblemDetails()
             {
@@ -159,7 +142,7 @@ namespace CrouseMath.WebUI.Filters
 
         private void HandleClassIsFulleException(ExceptionContext context)
         {
-            var exception = context.Exception as TeacherDoesNotTeachSubjectException;
+            var exception = context.Exception as ClassIsFullException;
 
             var details = new ProblemDetails()
             {

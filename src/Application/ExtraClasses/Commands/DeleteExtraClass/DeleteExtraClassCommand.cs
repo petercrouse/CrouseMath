@@ -34,10 +34,9 @@ namespace CrouseMath.Application.ExtraClasses.Commands.DeleteExtraClass
                 var hasBookings = _context.Bookings.Any(b => b.ExtraClassId == entity.Id);
                 if (hasBookings)
                 {
-                    throw new DeleteFailureException(nameof(Student), request.Id, "There are exisiting bookings associated with this class");
+                    throw new DeleteFailureException(nameof(ExtraClass), request.Id, "There are exisiting bookings associated with this class");
                 }
 
-                //ToDo: decide on the best way to delete a class
                 _context.ExtraClasses.Remove(entity);
 
                 await _context.SaveChangesAsync(cancellationToken);

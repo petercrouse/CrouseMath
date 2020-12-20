@@ -30,10 +30,8 @@ namespace CrouseMath.Infrastructure.Persistence
             _dateTime = dateTime;
         }
 
-        public DbSet<Student> Students { get; set; }
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<ExtraClass> ExtraClasses { get; set; }
-        public DbSet<Teacher> Teachers { get; set; }
         public DbSet<Subject> Subjects { get; set; }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())

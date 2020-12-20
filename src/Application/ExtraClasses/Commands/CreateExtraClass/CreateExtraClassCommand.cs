@@ -2,10 +2,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using CrouseMath.Application.Common.Exceptions;
-using CrouseMath.Application.Common.Extensions;
 using CrouseMath.Application.Common.Interfaces;
 using CrouseMath.Domain.Entities;
+using CrouseMath.Application.Common.Exceptions;
 
 namespace CrouseMath.Application.ExtraClasses.Commands.CreateExtraClass
 {
@@ -13,34 +12,30 @@ namespace CrouseMath.Application.ExtraClasses.Commands.CreateExtraClass
     {
         public string Name { get; set; }
         public DateTime Date { get; set; }
-        public int? TeacherId { get; set; }
         public int Size { get; set; }
         public TimeSpan Duration { get; set; }
-        public int SubjectId { get; set; }
+        public long SubjectId { get; set; }
         public double Price { get; set; }
     }
     
     public class CreateExtraClassCommandHandler : IRequestHandler<CreateExtraClassCommand, long>
     {
         private readonly IApplicationDbContext _context;
+        private readonly ICurrentUserService _currentUserService;
 
-        public CreateExtraClassCommandHandler(IApplicationDbContext context)
+        public CreateExtraClassCommandHandler(IApplicationDbContext context, ICurrentUserService currentUserService)
         {
             _context = context;
+            _currentUserService = currentUserService;
         }
 
         public async Task<long> Handle(CreateExtraClassCommand request, CancellationToken cancellationToken)
         {
-            var teacher = await _context.Teachers.FindAsync(request.TeacherId, cancellationToken);
+            var subject = await _context.Subjects.FindAsync(request.SubjectId);
 
-            if (teacher == null)
+            if(subject == null)
             {
-                throw new NotFoundException(nameof(Teacher), request.TeacherId);
-            }          
-
-            if (!teacher.TeachSubject(request.SubjectId))
-            {
-                throw new TeacherDoesNotTeachSubjectException(teacher.Id, request.SubjectId);
+                throw new NotFoundException(nameof(Subject), request.SubjectId);
             }
 
             var entity = new ExtraClass
@@ -51,7 +46,7 @@ namespace CrouseMath.Application.ExtraClasses.Commands.CreateExtraClass
                 IsClassFull = false,
                 Size = request.Size,
                 SubjectId = request.SubjectId,
-                TeacherId = request.TeacherId,
+                TeacherId = _currentUserService.UserId,
                 Price = request.Price,
             };
 

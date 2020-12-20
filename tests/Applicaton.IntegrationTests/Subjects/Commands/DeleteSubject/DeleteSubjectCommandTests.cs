@@ -1,32 +1,60 @@
-﻿using System.Threading;
-using CrouseMath.Application.Common.Exceptions;
+﻿using CrouseMath.Application.Common.Exceptions;
+using CrouseMath.Application.ExtraClasses.Commands.CreateExtraClass;
+using CrouseMath.Application.IntegrationTests;
+using CrouseMath.Application.Subjects.Commands.CreateSubject;
 using CrouseMath.Application.Subjects.Commands.DeleteSubject;
-using Xunit;
+using CrouseMath.Domain.Entities;
+using FluentAssertions;
+using NUnit.Framework;
+using System;
+using System.Threading.Tasks;
 
 namespace CrouseMath.Application.UnitTests.Subjects.Commands.DeleteSubject
 {
-    public class DeleteSubjectCommandTests : CommandTestBase
-    {
-        [Fact]
-        public async void DeleteSubjectCommand_ShouldThrowDeleteFailureException()
-        {
-            //Arrange
-            var sut = new DeleteSubjectCommand.DeleteSubjectCommandHandler(Context);
-            var command = new DeleteSubjectCommand { Id = 1 };
+    using static Testing;
 
-            //Assert
-            await Assert.ThrowsAsync<DeleteFailureException>(async () => await sut.Handle(command, CancellationToken.None));
+    public class DeleteSubjectCommandTests : TestBase
+    {
+        [Test]
+        public async Task DeleteSubjectCommand_ShouldThrowDeleteFailureExceptionAsync()
+        {
+            var subjectId = await SendAsync(new CreateSubjectCommand { Name = "StaffLogic" });
+            var extraClassId = await SendAsync(new CreateExtraClassCommand
+            {
+                SubjectId = subjectId,
+                Date = DateTime.Now,
+                Duration = TimeSpan.FromMinutes(60),
+                Name = "StaffLogic",
+                Price = 100,
+                Size = 2
+            });
+
+            var command = new DeleteSubjectCommand { Id = subjectId };
+
+            FluentActions.Invoking(() =>
+                SendAsync(command)).Should().Throw<DeleteFailureException>();
         }
 
-        [Fact]
-        public async void DeleteSubjectCommand_ShouldThrowNotFoundException()
+        [Test]
+        public void DeleteSubjectCommand_ShouldThrowNotFoundException()
         {
-            //Arrange
-            var sut = new DeleteSubjectCommand.DeleteSubjectCommandHandler(Context);
             var command = new DeleteSubjectCommand { Id = 99 };
 
-            //Assert
-            await Assert.ThrowsAnyAsync<NotFoundException>(async () => await sut.Handle(command, CancellationToken.None));
+            FluentActions.Invoking(() =>
+             SendAsync(command)).Should().Throw<NotFoundException>();
+        }
+
+        [Test]
+        public async Task DeleteSubjectCommand_ShouldDeleteSuccessfully()
+        {
+            var command = new CreateSubjectCommand { Name = "StaffLogic" };
+
+            var subjectId = await SendAsync(command);
+
+            await SendAsync(new DeleteSubjectCommand { Id = subjectId });
+
+            var subject = await FindAsync<Subject>(subjectId);
+            subject.Should().BeNull();
         }
     }
 }

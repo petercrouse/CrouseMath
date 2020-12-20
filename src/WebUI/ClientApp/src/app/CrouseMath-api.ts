@@ -16,8 +16,8 @@ export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 
 export interface IBookingsClient {
     getAll(): Observable<BookingListViewModel>;
-    create(command: CreateBookingCommand): Observable<FileResponse>;
     get(id: number): Observable<BookingViewModel>;
+    create(command: CreateBookingCommand): Observable<FileResponse>;
     update(id: string, command: UpdateBookingCommand): Observable<void>;
     delete(id: number): Observable<void>;
 }
@@ -36,7 +36,7 @@ export class BookingsClient implements IBookingsClient {
     }
 
     getAll(): Observable<BookingListViewModel> {
-        let url_ = this.baseUrl + "/api/Bookings";
+        let url_ = this.baseUrl + "/api/Bookings/GetAll";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -83,58 +83,8 @@ export class BookingsClient implements IBookingsClient {
         return _observableOf<BookingListViewModel>(<any>null);
     }
 
-    create(command: CreateBookingCommand): Observable<FileResponse> {
-        let url_ = this.baseUrl + "/api/Bookings";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(command);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",			
-            headers: new HttpHeaders({
-                "Content-Type": "application/json", 
-                "Accept": "application/octet-stream"
-            })
-        };
-
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processCreate(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processCreate(<any>response_);
-                } catch (e) {
-                    return <Observable<FileResponse>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<FileResponse>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processCreate(response: HttpResponseBase): Observable<FileResponse> {
-        const status = response.status;
-        const responseBlob = 
-            response instanceof HttpResponse ? response.body : 
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 200 || status === 206) {
-            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
-            const fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
-            const fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
-            return _observableOf({ fileName: fileName, data: <any>responseBlob, status: status, headers: _headers });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<FileResponse>(<any>null);
-    }
-
     get(id: number): Observable<BookingViewModel> {
-        let url_ = this.baseUrl + "/api/Bookings/{id}";
+        let url_ = this.baseUrl + "/api/Bookings/Get/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id)); 
@@ -184,8 +134,58 @@ export class BookingsClient implements IBookingsClient {
         return _observableOf<BookingViewModel>(<any>null);
     }
 
+    create(command: CreateBookingCommand): Observable<FileResponse> {
+        let url_ = this.baseUrl + "/api/Bookings/Create";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(command);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",			
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+                "Accept": "application/octet-stream"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreate(<any>response_);
+                } catch (e) {
+                    return <Observable<FileResponse>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<FileResponse>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processCreate(response: HttpResponseBase): Observable<FileResponse> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
+            const fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+            const fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            return _observableOf({ fileName: fileName, data: <any>responseBlob, status: status, headers: _headers });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<FileResponse>(<any>null);
+    }
+
     update(id: string, command: UpdateBookingCommand): Observable<void> {
-        let url_ = this.baseUrl + "/api/Bookings/{id}";
+        let url_ = this.baseUrl + "/api/Bookings/Update/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id)); 
@@ -243,7 +243,7 @@ export class BookingsClient implements IBookingsClient {
     }
 
     delete(id: number): Observable<void> {
-        let url_ = this.baseUrl + "/api/Bookings/{id}";
+        let url_ = this.baseUrl + "/api/Bookings/Delete/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id)); 
@@ -299,8 +299,8 @@ export class BookingsClient implements IBookingsClient {
 
 export interface IExtraClassesClient {
     getAll(): Observable<ExtraClassListViewModel>;
-    create(command: CreateExtraClassCommand): Observable<FileResponse>;
     get(id: number): Observable<ExtraClassViewModel>;
+    create(command: CreateExtraClassCommand): Observable<FileResponse>;
     update(id: string, command: UpdateExtraClassCommand): Observable<void>;
     delete(id: number): Observable<void>;
 }
@@ -319,7 +319,7 @@ export class ExtraClassesClient implements IExtraClassesClient {
     }
 
     getAll(): Observable<ExtraClassListViewModel> {
-        let url_ = this.baseUrl + "/api/ExtraClasses";
+        let url_ = this.baseUrl + "/api/ExtraClasses/GetAll";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -366,58 +366,8 @@ export class ExtraClassesClient implements IExtraClassesClient {
         return _observableOf<ExtraClassListViewModel>(<any>null);
     }
 
-    create(command: CreateExtraClassCommand): Observable<FileResponse> {
-        let url_ = this.baseUrl + "/api/ExtraClasses";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(command);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",			
-            headers: new HttpHeaders({
-                "Content-Type": "application/json", 
-                "Accept": "application/octet-stream"
-            })
-        };
-
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processCreate(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processCreate(<any>response_);
-                } catch (e) {
-                    return <Observable<FileResponse>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<FileResponse>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processCreate(response: HttpResponseBase): Observable<FileResponse> {
-        const status = response.status;
-        const responseBlob = 
-            response instanceof HttpResponse ? response.body : 
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 200 || status === 206) {
-            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
-            const fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
-            const fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
-            return _observableOf({ fileName: fileName, data: <any>responseBlob, status: status, headers: _headers });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<FileResponse>(<any>null);
-    }
-
     get(id: number): Observable<ExtraClassViewModel> {
-        let url_ = this.baseUrl + "/api/ExtraClasses/{id}";
+        let url_ = this.baseUrl + "/api/ExtraClasses/Get/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id)); 
@@ -467,11 +417,8 @@ export class ExtraClassesClient implements IExtraClassesClient {
         return _observableOf<ExtraClassViewModel>(<any>null);
     }
 
-    update(id: string, command: UpdateExtraClassCommand): Observable<void> {
-        let url_ = this.baseUrl + "/api/ExtraClasses/{id}";
-        if (id === undefined || id === null)
-            throw new Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id)); 
+    create(command: CreateExtraClassCommand): Observable<FileResponse> {
+        let url_ = this.baseUrl + "/api/ExtraClasses/Create";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(command);
@@ -482,185 +429,7 @@ export class ExtraClassesClient implements IExtraClassesClient {
             responseType: "blob",			
             headers: new HttpHeaders({
                 "Content-Type": "application/json", 
-            })
-        };
-
-        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processUpdate(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processUpdate(<any>response_);
-                } catch (e) {
-                    return <Observable<void>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<void>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processUpdate(response: HttpResponseBase): Observable<void> {
-        const status = response.status;
-        const responseBlob = 
-            response instanceof HttpResponse ? response.body : 
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return _observableOf<void>(<any>null);
-            }));
-        } else if (status === 404) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result404: any = null;
-            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result404 = ProblemDetails.fromJS(resultData404);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<void>(<any>null);
-    }
-
-    delete(id: number): Observable<void> {
-        let url_ = this.baseUrl + "/api/ExtraClasses/{id}";
-        if (id === undefined || id === null)
-            throw new Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id)); 
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",			
-            headers: new HttpHeaders({
-            })
-        };
-
-        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processDelete(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processDelete(<any>response_);
-                } catch (e) {
-                    return <Observable<void>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<void>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processDelete(response: HttpResponseBase): Observable<void> {
-        const status = response.status;
-        const responseBlob = 
-            response instanceof HttpResponse ? response.body : 
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return _observableOf<void>(<any>null);
-            }));
-        } else if (status === 404) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result404: any = null;
-            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result404 = ProblemDetails.fromJS(resultData404);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<void>(<any>null);
-    }
-}
-
-export interface IStudentsClient {
-    getAll(): Observable<StudentListViewModel>;
-    create(command: CreateStudentCommand): Observable<void>;
-    get(id: number): Observable<StudentViewModel>;
-    update(id: string, command: UpdateStudentCommand): Observable<void>;
-    delete(id: number): Observable<void>;
-}
-
-@Injectable({
-    providedIn: 'root'
-})
-export class StudentsClient implements IStudentsClient {
-    private http: HttpClient;
-    private baseUrl: string;
-    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
-
-    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
-        this.http = http;
-        this.baseUrl = baseUrl ? baseUrl : "";
-    }
-
-    getAll(): Observable<StudentListViewModel> {
-        let url_ = this.baseUrl + "/api/Students";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",			
-            headers: new HttpHeaders({
-                "Accept": "application/json"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetAll(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetAll(<any>response_);
-                } catch (e) {
-                    return <Observable<StudentListViewModel>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<StudentListViewModel>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processGetAll(response: HttpResponseBase): Observable<StudentListViewModel> {
-        const status = response.status;
-        const responseBlob = 
-            response instanceof HttpResponse ? response.body : 
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = StudentListViewModel.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<StudentListViewModel>(<any>null);
-    }
-
-    create(command: CreateStudentCommand): Observable<void> {
-        let url_ = this.baseUrl + "/api/Students";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(command);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",			
-            headers: new HttpHeaders({
-                "Content-Type": "application/json", 
+                "Accept": "application/octet-stream"
             })
         };
 
@@ -671,87 +440,35 @@ export class StudentsClient implements IStudentsClient {
                 try {
                     return this.processCreate(<any>response_);
                 } catch (e) {
-                    return <Observable<void>><any>_observableThrow(e);
+                    return <Observable<FileResponse>><any>_observableThrow(e);
                 }
             } else
-                return <Observable<void>><any>_observableThrow(response_);
+                return <Observable<FileResponse>><any>_observableThrow(response_);
         }));
     }
 
-    protected processCreate(response: HttpResponseBase): Observable<void> {
+    protected processCreate(response: HttpResponseBase): Observable<FileResponse> {
         const status = response.status;
         const responseBlob = 
             response instanceof HttpResponse ? response.body : 
             (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return _observableOf<void>(<any>null);
-            }));
-        } else {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let resultdefault: any = null;
-            let resultDatadefault = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            resultdefault = ProblemDetails.fromJS(resultDatadefault);
-            return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
-            }));
-        }
-    }
-
-    get(id: number): Observable<StudentViewModel> {
-        let url_ = this.baseUrl + "/api/Students/{id}";
-        if (id === undefined || id === null)
-            throw new Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id)); 
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",			
-            headers: new HttpHeaders({
-                "Accept": "application/json"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGet(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGet(<any>response_);
-                } catch (e) {
-                    return <Observable<StudentViewModel>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<StudentViewModel>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processGet(response: HttpResponseBase): Observable<StudentViewModel> {
-        const status = response.status;
-        const responseBlob = 
-            response instanceof HttpResponse ? response.body : 
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = StudentViewModel.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
+            const fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+            const fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            return _observableOf({ fileName: fileName, data: <any>responseBlob, status: status, headers: _headers });
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<StudentViewModel>(<any>null);
+        return _observableOf<FileResponse>(<any>null);
     }
 
-    update(id: string, command: UpdateStudentCommand): Observable<void> {
-        let url_ = this.baseUrl + "/api/Students/{id}";
+    update(id: string, command: UpdateExtraClassCommand): Observable<void> {
+        let url_ = this.baseUrl + "/api/ExtraClasses/Update/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id)); 
@@ -809,7 +526,7 @@ export class StudentsClient implements IStudentsClient {
     }
 
     delete(id: number): Observable<void> {
-        let url_ = this.baseUrl + "/api/Students/{id}";
+        let url_ = this.baseUrl + "/api/ExtraClasses/Delete/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id)); 
@@ -865,8 +582,8 @@ export class StudentsClient implements IStudentsClient {
 
 export interface ISubjectsClient {
     getAll(): Observable<SubjectListViewModel>;
-    create(command: CreateSubjectCommand): Observable<ProblemDetails>;
     get(id: number): Observable<SubjectViewModel>;
+    create(command: CreateSubjectCommand): Observable<ProblemDetails>;
     update(id: string, command: UpdateSubjectCommand): Observable<void>;
     delete(id: number): Observable<void>;
 }
@@ -885,7 +602,7 @@ export class SubjectsClient implements ISubjectsClient {
     }
 
     getAll(): Observable<SubjectListViewModel> {
-        let url_ = this.baseUrl + "/api/Subjects";
+        let url_ = this.baseUrl + "/api/Subjects/GetAll";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -932,55 +649,8 @@ export class SubjectsClient implements ISubjectsClient {
         return _observableOf<SubjectListViewModel>(<any>null);
     }
 
-    create(command: CreateSubjectCommand): Observable<ProblemDetails> {
-        let url_ = this.baseUrl + "/api/Subjects";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(command);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",			
-            headers: new HttpHeaders({
-                "Content-Type": "application/json", 
-                "Accept": "application/json"
-            })
-        };
-
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processCreate(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processCreate(<any>response_);
-                } catch (e) {
-                    return <Observable<ProblemDetails>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<ProblemDetails>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processCreate(response: HttpResponseBase): Observable<ProblemDetails> {
-        const status = response.status;
-        const responseBlob = 
-            response instanceof HttpResponse ? response.body : 
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let resultdefault: any = null;
-            let resultDatadefault = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            resultdefault = ProblemDetails.fromJS(resultDatadefault);
-            return _observableOf(resultdefault);
-            }));
-        }
-    }
-
     get(id: number): Observable<SubjectViewModel> {
-        let url_ = this.baseUrl + "/api/Subjects/{id}";
+        let url_ = this.baseUrl + "/api/Subjects/Get/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id)); 
@@ -1030,11 +700,8 @@ export class SubjectsClient implements ISubjectsClient {
         return _observableOf<SubjectViewModel>(<any>null);
     }
 
-    update(id: string, command: UpdateSubjectCommand): Observable<void> {
-        let url_ = this.baseUrl + "/api/Subjects/{id}";
-        if (id === undefined || id === null)
-            throw new Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id)); 
+    create(command: CreateSubjectCommand): Observable<ProblemDetails> {
+        let url_ = this.baseUrl + "/api/Subjects/Create";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(command);
@@ -1045,185 +712,7 @@ export class SubjectsClient implements ISubjectsClient {
             responseType: "blob",			
             headers: new HttpHeaders({
                 "Content-Type": "application/json", 
-            })
-        };
-
-        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processUpdate(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processUpdate(<any>response_);
-                } catch (e) {
-                    return <Observable<void>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<void>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processUpdate(response: HttpResponseBase): Observable<void> {
-        const status = response.status;
-        const responseBlob = 
-            response instanceof HttpResponse ? response.body : 
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return _observableOf<void>(<any>null);
-            }));
-        } else if (status === 404) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result404: any = null;
-            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result404 = ProblemDetails.fromJS(resultData404);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<void>(<any>null);
-    }
-
-    delete(id: number): Observable<void> {
-        let url_ = this.baseUrl + "/api/Subjects/{id}";
-        if (id === undefined || id === null)
-            throw new Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id)); 
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",			
-            headers: new HttpHeaders({
-            })
-        };
-
-        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processDelete(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processDelete(<any>response_);
-                } catch (e) {
-                    return <Observable<void>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<void>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processDelete(response: HttpResponseBase): Observable<void> {
-        const status = response.status;
-        const responseBlob = 
-            response instanceof HttpResponse ? response.body : 
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return _observableOf<void>(<any>null);
-            }));
-        } else if (status === 404) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result404: any = null;
-            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result404 = ProblemDetails.fromJS(resultData404);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<void>(<any>null);
-    }
-}
-
-export interface ITeachersClient {
-    getAll(): Observable<TeacherListViewModel>;
-    create(command: CreateTeacherCommand): Observable<void>;
-    get(id: number): Observable<TeacherViewModel>;
-    update(id: string, command: UpdateTeacherCommand): Observable<void>;
-    delete(id: number): Observable<void>;
-}
-
-@Injectable({
-    providedIn: 'root'
-})
-export class TeachersClient implements ITeachersClient {
-    private http: HttpClient;
-    private baseUrl: string;
-    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
-
-    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
-        this.http = http;
-        this.baseUrl = baseUrl ? baseUrl : "";
-    }
-
-    getAll(): Observable<TeacherListViewModel> {
-        let url_ = this.baseUrl + "/api/Teachers";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",			
-            headers: new HttpHeaders({
                 "Accept": "application/json"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetAll(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetAll(<any>response_);
-                } catch (e) {
-                    return <Observable<TeacherListViewModel>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<TeacherListViewModel>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processGetAll(response: HttpResponseBase): Observable<TeacherListViewModel> {
-        const status = response.status;
-        const responseBlob = 
-            response instanceof HttpResponse ? response.body : 
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = TeacherListViewModel.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<TeacherListViewModel>(<any>null);
-    }
-
-    create(command: CreateTeacherCommand): Observable<void> {
-        let url_ = this.baseUrl + "/api/Teachers";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(command);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",			
-            headers: new HttpHeaders({
-                "Content-Type": "application/json", 
             })
         };
 
@@ -1234,87 +723,32 @@ export class TeachersClient implements ITeachersClient {
                 try {
                     return this.processCreate(<any>response_);
                 } catch (e) {
-                    return <Observable<void>><any>_observableThrow(e);
+                    return <Observable<ProblemDetails>><any>_observableThrow(e);
                 }
             } else
-                return <Observable<void>><any>_observableThrow(response_);
+                return <Observable<ProblemDetails>><any>_observableThrow(response_);
         }));
     }
 
-    protected processCreate(response: HttpResponseBase): Observable<void> {
+    protected processCreate(response: HttpResponseBase): Observable<ProblemDetails> {
         const status = response.status;
         const responseBlob = 
             response instanceof HttpResponse ? response.body : 
             (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return _observableOf<void>(<any>null);
-            }));
-        } else {
+        {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let resultdefault: any = null;
             let resultDatadefault = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             resultdefault = ProblemDetails.fromJS(resultDatadefault);
-            return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
+            return _observableOf(resultdefault);
             }));
         }
     }
 
-    get(id: number): Observable<TeacherViewModel> {
-        let url_ = this.baseUrl + "/api/Teachers/{id}";
-        if (id === undefined || id === null)
-            throw new Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id)); 
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",			
-            headers: new HttpHeaders({
-                "Accept": "application/json"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGet(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGet(<any>response_);
-                } catch (e) {
-                    return <Observable<TeacherViewModel>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<TeacherViewModel>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processGet(response: HttpResponseBase): Observable<TeacherViewModel> {
-        const status = response.status;
-        const responseBlob = 
-            response instanceof HttpResponse ? response.body : 
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = TeacherViewModel.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<TeacherViewModel>(<any>null);
-    }
-
-    update(id: string, command: UpdateTeacherCommand): Observable<void> {
-        let url_ = this.baseUrl + "/api/Teachers/{id}";
+    update(id: string, command: UpdateSubjectCommand): Observable<void> {
+        let url_ = this.baseUrl + "/api/Subjects/Update/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id)); 
@@ -1372,7 +806,7 @@ export class TeachersClient implements ITeachersClient {
     }
 
     delete(id: number): Observable<void> {
-        let url_ = this.baseUrl + "/api/Teachers/{id}";
+        let url_ = this.baseUrl + "/api/Subjects/Delete/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id)); 
@@ -1427,7 +861,7 @@ export class TeachersClient implements ITeachersClient {
 }
 
 export class BookingListViewModel implements IBookingListViewModel {
-    bookings?: BookingLookup[] | undefined;
+    bookings?: BookingLookupDto[] | undefined;
 
     constructor(data?: IBookingListViewModel) {
         if (data) {
@@ -1443,7 +877,7 @@ export class BookingListViewModel implements IBookingListViewModel {
             if (Array.isArray(_data["bookings"])) {
                 this.bookings = [] as any;
                 for (let item of _data["bookings"])
-                    this.bookings!.push(BookingLookup.fromJS(item));
+                    this.bookings!.push(BookingLookupDto.fromJS(item));
             }
         }
     }
@@ -1467,15 +901,15 @@ export class BookingListViewModel implements IBookingListViewModel {
 }
 
 export interface IBookingListViewModel {
-    bookings?: BookingLookup[] | undefined;
+    bookings?: BookingLookupDto[] | undefined;
 }
 
-export class BookingLookup implements IBookingLookup {
+export class BookingLookupDto implements IBookingLookupDto {
     id?: number;
-    studentName?: string | undefined;
+    userFullName?: string | undefined;
     extraClassName?: string | undefined;
 
-    constructor(data?: IBookingLookup) {
+    constructor(data?: IBookingLookupDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -1487,14 +921,14 @@ export class BookingLookup implements IBookingLookup {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
-            this.studentName = _data["studentName"];
+            this.userFullName = _data["userFullName"];
             this.extraClassName = _data["extraClassName"];
         }
     }
 
-    static fromJS(data: any): BookingLookup {
+    static fromJS(data: any): BookingLookupDto {
         data = typeof data === 'object' ? data : {};
-        let result = new BookingLookup();
+        let result = new BookingLookupDto();
         result.init(data);
         return result;
     }
@@ -1502,15 +936,15 @@ export class BookingLookup implements IBookingLookup {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
-        data["studentName"] = this.studentName;
+        data["userFullName"] = this.userFullName;
         data["extraClassName"] = this.extraClassName;
         return data; 
     }
 }
 
-export interface IBookingLookup {
+export interface IBookingLookupDto {
     id?: number;
-    studentName?: string | undefined;
+    userFullName?: string | undefined;
     extraClassName?: string | undefined;
 }
 
@@ -1554,8 +988,8 @@ export class BookingDto implements IBookingDto {
     id?: number;
     extraClassId?: number;
     extraClassName?: string | undefined;
-    studentId?: number;
-    studentName?: string | undefined;
+    userId?: string | undefined;
+    userFullName?: string | undefined;
     paid?: boolean;
     price?: number;
 
@@ -1573,8 +1007,8 @@ export class BookingDto implements IBookingDto {
             this.id = _data["id"];
             this.extraClassId = _data["extraClassId"];
             this.extraClassName = _data["extraClassName"];
-            this.studentId = _data["studentId"];
-            this.studentName = _data["studentName"];
+            this.userId = _data["userId"];
+            this.userFullName = _data["userFullName"];
             this.paid = _data["paid"];
             this.price = _data["price"];
         }
@@ -1592,8 +1026,8 @@ export class BookingDto implements IBookingDto {
         data["id"] = this.id;
         data["extraClassId"] = this.extraClassId;
         data["extraClassName"] = this.extraClassName;
-        data["studentId"] = this.studentId;
-        data["studentName"] = this.studentName;
+        data["userId"] = this.userId;
+        data["userFullName"] = this.userFullName;
         data["paid"] = this.paid;
         data["price"] = this.price;
         return data; 
@@ -1604,15 +1038,14 @@ export interface IBookingDto {
     id?: number;
     extraClassId?: number;
     extraClassName?: string | undefined;
-    studentId?: number;
-    studentName?: string | undefined;
+    userId?: string | undefined;
+    userFullName?: string | undefined;
     paid?: boolean;
     price?: number;
 }
 
 export class CreateBookingCommand implements ICreateBookingCommand {
     extraClassId?: number;
-    studentId?: number;
 
     constructor(data?: ICreateBookingCommand) {
         if (data) {
@@ -1626,7 +1059,6 @@ export class CreateBookingCommand implements ICreateBookingCommand {
     init(_data?: any) {
         if (_data) {
             this.extraClassId = _data["extraClassId"];
-            this.studentId = _data["studentId"];
         }
     }
 
@@ -1640,14 +1072,12 @@ export class CreateBookingCommand implements ICreateBookingCommand {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["extraClassId"] = this.extraClassId;
-        data["studentId"] = this.studentId;
         return data; 
     }
 }
 
 export interface ICreateBookingCommand {
     extraClassId?: number;
-    studentId?: number;
 }
 
 export class ProblemDetails implements IProblemDetails {
@@ -1890,7 +1320,7 @@ export class ExtraClassDto implements IExtraClassDto {
     id?: number;
     name?: string | undefined;
     date?: Date;
-    teacherId?: number | undefined;
+    teacherId?: string | undefined;
     teacherName?: string | undefined;
     size?: number;
     isClassFull?: boolean;
@@ -1952,7 +1382,7 @@ export interface IExtraClassDto {
     id?: number;
     name?: string | undefined;
     date?: Date;
-    teacherId?: number | undefined;
+    teacherId?: string | undefined;
     teacherName?: string | undefined;
     size?: number;
     isClassFull?: boolean;
@@ -1965,7 +1395,6 @@ export interface IExtraClassDto {
 export class CreateExtraClassCommand implements ICreateExtraClassCommand {
     name?: string | undefined;
     date?: Date;
-    teacherId?: number | undefined;
     size?: number;
     duration?: string;
     subjectId?: number;
@@ -1984,7 +1413,6 @@ export class CreateExtraClassCommand implements ICreateExtraClassCommand {
         if (_data) {
             this.name = _data["name"];
             this.date = _data["date"] ? new Date(_data["date"].toString()) : <any>undefined;
-            this.teacherId = _data["teacherId"];
             this.size = _data["size"];
             this.duration = _data["duration"];
             this.subjectId = _data["subjectId"];
@@ -2003,7 +1431,6 @@ export class CreateExtraClassCommand implements ICreateExtraClassCommand {
         data = typeof data === 'object' ? data : {};
         data["name"] = this.name;
         data["date"] = this.date ? this.date.toISOString() : <any>undefined;
-        data["teacherId"] = this.teacherId;
         data["size"] = this.size;
         data["duration"] = this.duration;
         data["subjectId"] = this.subjectId;
@@ -2015,7 +1442,6 @@ export class CreateExtraClassCommand implements ICreateExtraClassCommand {
 export interface ICreateExtraClassCommand {
     name?: string | undefined;
     date?: Date;
-    teacherId?: number | undefined;
     size?: number;
     duration?: string;
     subjectId?: number;
@@ -2026,7 +1452,7 @@ export class UpdateExtraClassCommand implements IUpdateExtraClassCommand {
     id?: number;
     name?: string | undefined;
     date?: Date;
-    teacherId?: number | undefined;
+    teacherId?: string | undefined;
     size?: number;
     duration?: string;
     subjectId?: number;
@@ -2079,271 +1505,11 @@ export interface IUpdateExtraClassCommand {
     id?: number;
     name?: string | undefined;
     date?: Date;
-    teacherId?: number | undefined;
+    teacherId?: string | undefined;
     size?: number;
     duration?: string;
     subjectId?: number;
     price?: number;
-}
-
-export class StudentListViewModel implements IStudentListViewModel {
-    students?: StudentLookup[] | undefined;
-
-    constructor(data?: IStudentListViewModel) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            if (Array.isArray(_data["students"])) {
-                this.students = [] as any;
-                for (let item of _data["students"])
-                    this.students!.push(StudentLookup.fromJS(item));
-            }
-        }
-    }
-
-    static fromJS(data: any): StudentListViewModel {
-        data = typeof data === 'object' ? data : {};
-        let result = new StudentListViewModel();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        if (Array.isArray(this.students)) {
-            data["students"] = [];
-            for (let item of this.students)
-                data["students"].push(item.toJSON());
-        }
-        return data; 
-    }
-}
-
-export interface IStudentListViewModel {
-    students?: StudentLookup[] | undefined;
-}
-
-export class StudentLookup implements IStudentLookup {
-    id?: number;
-    name?: string | undefined;
-
-    constructor(data?: IStudentLookup) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.name = _data["name"];
-        }
-    }
-
-    static fromJS(data: any): StudentLookup {
-        data = typeof data === 'object' ? data : {};
-        let result = new StudentLookup();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["name"] = this.name;
-        return data; 
-    }
-}
-
-export interface IStudentLookup {
-    id?: number;
-    name?: string | undefined;
-}
-
-export class StudentViewModel implements IStudentViewModel {
-    student?: StudentDto | undefined;
-
-    constructor(data?: IStudentViewModel) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.student = _data["student"] ? StudentDto.fromJS(_data["student"]) : <any>undefined;
-        }
-    }
-
-    static fromJS(data: any): StudentViewModel {
-        data = typeof data === 'object' ? data : {};
-        let result = new StudentViewModel();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["student"] = this.student ? this.student.toJSON() : <any>undefined;
-        return data; 
-    }
-}
-
-export interface IStudentViewModel {
-    student?: StudentDto | undefined;
-}
-
-export class StudentDto implements IStudentDto {
-    id?: number;
-    lastName?: string | undefined;
-    firstName?: string | undefined;
-    email?: string | undefined;
-
-    constructor(data?: IStudentDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.lastName = _data["lastName"];
-            this.firstName = _data["firstName"];
-            this.email = _data["email"];
-        }
-    }
-
-    static fromJS(data: any): StudentDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new StudentDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["lastName"] = this.lastName;
-        data["firstName"] = this.firstName;
-        data["email"] = this.email;
-        return data; 
-    }
-}
-
-export interface IStudentDto {
-    id?: number;
-    lastName?: string | undefined;
-    firstName?: string | undefined;
-    email?: string | undefined;
-}
-
-export class CreateStudentCommand implements ICreateStudentCommand {
-    lastName?: string | undefined;
-    firstName?: string | undefined;
-    email?: string | undefined;
-
-    constructor(data?: ICreateStudentCommand) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.lastName = _data["lastName"];
-            this.firstName = _data["firstName"];
-            this.email = _data["email"];
-        }
-    }
-
-    static fromJS(data: any): CreateStudentCommand {
-        data = typeof data === 'object' ? data : {};
-        let result = new CreateStudentCommand();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["lastName"] = this.lastName;
-        data["firstName"] = this.firstName;
-        data["email"] = this.email;
-        return data; 
-    }
-}
-
-export interface ICreateStudentCommand {
-    lastName?: string | undefined;
-    firstName?: string | undefined;
-    email?: string | undefined;
-}
-
-export class UpdateStudentCommand implements IUpdateStudentCommand {
-    id?: number;
-    lastName?: string | undefined;
-    firstName?: string | undefined;
-    email?: string | undefined;
-
-    constructor(data?: IUpdateStudentCommand) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.lastName = _data["lastName"];
-            this.firstName = _data["firstName"];
-            this.email = _data["email"];
-        }
-    }
-
-    static fromJS(data: any): UpdateStudentCommand {
-        data = typeof data === 'object' ? data : {};
-        let result = new UpdateStudentCommand();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["lastName"] = this.lastName;
-        data["firstName"] = this.firstName;
-        data["email"] = this.email;
-        return data; 
-    }
-}
-
-export interface IUpdateStudentCommand {
-    id?: number;
-    lastName?: string | undefined;
-    firstName?: string | undefined;
-    email?: string | undefined;
 }
 
 export class SubjectListViewModel implements ISubjectListViewModel {
@@ -2580,266 +1746,6 @@ export class UpdateSubjectCommand implements IUpdateSubjectCommand {
 export interface IUpdateSubjectCommand {
     id?: number;
     name?: string | undefined;
-}
-
-export class TeacherListViewModel implements ITeacherListViewModel {
-    teachers?: TeacherLookup[] | undefined;
-
-    constructor(data?: ITeacherListViewModel) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            if (Array.isArray(_data["teachers"])) {
-                this.teachers = [] as any;
-                for (let item of _data["teachers"])
-                    this.teachers!.push(TeacherLookup.fromJS(item));
-            }
-        }
-    }
-
-    static fromJS(data: any): TeacherListViewModel {
-        data = typeof data === 'object' ? data : {};
-        let result = new TeacherListViewModel();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        if (Array.isArray(this.teachers)) {
-            data["teachers"] = [];
-            for (let item of this.teachers)
-                data["teachers"].push(item.toJSON());
-        }
-        return data; 
-    }
-}
-
-export interface ITeacherListViewModel {
-    teachers?: TeacherLookup[] | undefined;
-}
-
-export class TeacherLookup implements ITeacherLookup {
-    id?: number;
-    name?: string | undefined;
-
-    constructor(data?: ITeacherLookup) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.name = _data["name"];
-        }
-    }
-
-    static fromJS(data: any): TeacherLookup {
-        data = typeof data === 'object' ? data : {};
-        let result = new TeacherLookup();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["name"] = this.name;
-        return data; 
-    }
-}
-
-export interface ITeacherLookup {
-    id?: number;
-    name?: string | undefined;
-}
-
-export class TeacherViewModel implements ITeacherViewModel {
-    teacher?: TeacherDto | undefined;
-
-    constructor(data?: ITeacherViewModel) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.teacher = _data["teacher"] ? TeacherDto.fromJS(_data["teacher"]) : <any>undefined;
-        }
-    }
-
-    static fromJS(data: any): TeacherViewModel {
-        data = typeof data === 'object' ? data : {};
-        let result = new TeacherViewModel();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["teacher"] = this.teacher ? this.teacher.toJSON() : <any>undefined;
-        return data; 
-    }
-}
-
-export interface ITeacherViewModel {
-    teacher?: TeacherDto | undefined;
-}
-
-export class TeacherDto implements ITeacherDto {
-    id?: number;
-    lastName?: string | undefined;
-    firstName?: string | undefined;
-    email?: string | undefined;
-
-    constructor(data?: ITeacherDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.lastName = _data["lastName"];
-            this.firstName = _data["firstName"];
-            this.email = _data["email"];
-        }
-    }
-
-    static fromJS(data: any): TeacherDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new TeacherDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["lastName"] = this.lastName;
-        data["firstName"] = this.firstName;
-        data["email"] = this.email;
-        return data; 
-    }
-}
-
-export interface ITeacherDto {
-    id?: number;
-    lastName?: string | undefined;
-    firstName?: string | undefined;
-    email?: string | undefined;
-}
-
-export class CreateTeacherCommand implements ICreateTeacherCommand {
-    lastName?: string | undefined;
-    firstName?: string | undefined;
-    email?: string | undefined;
-
-    constructor(data?: ICreateTeacherCommand) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.lastName = _data["lastName"];
-            this.firstName = _data["firstName"];
-            this.email = _data["email"];
-        }
-    }
-
-    static fromJS(data: any): CreateTeacherCommand {
-        data = typeof data === 'object' ? data : {};
-        let result = new CreateTeacherCommand();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["lastName"] = this.lastName;
-        data["firstName"] = this.firstName;
-        data["email"] = this.email;
-        return data; 
-    }
-}
-
-export interface ICreateTeacherCommand {
-    lastName?: string | undefined;
-    firstName?: string | undefined;
-    email?: string | undefined;
-}
-
-export class UpdateTeacherCommand implements IUpdateTeacherCommand {
-    id?: number;
-    lastName?: string | undefined;
-    firstName?: string | undefined;
-    email?: string | undefined;
-
-    constructor(data?: IUpdateTeacherCommand) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.lastName = _data["lastName"];
-            this.firstName = _data["firstName"];
-            this.email = _data["email"];
-        }
-    }
-
-    static fromJS(data: any): UpdateTeacherCommand {
-        data = typeof data === 'object' ? data : {};
-        let result = new UpdateTeacherCommand();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["lastName"] = this.lastName;
-        data["firstName"] = this.firstName;
-        data["email"] = this.email;
-        return data; 
-    }
-}
-
-export interface IUpdateTeacherCommand {
-    id?: number;
-    lastName?: string | undefined;
-    firstName?: string | undefined;
-    email?: string | undefined;
 }
 
 export interface FileResponse {

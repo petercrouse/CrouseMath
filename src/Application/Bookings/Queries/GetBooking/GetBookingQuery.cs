@@ -1,10 +1,12 @@
-﻿using System.Threading;
+﻿using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using CrouseMath.Application.Common.Exceptions;
 using CrouseMath.Application.Common.Interfaces;
 using CrouseMath.Domain.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace CrouseMath.Application.Bookings.Queries.GetBooking
 {
@@ -12,21 +14,25 @@ namespace CrouseMath.Application.Bookings.Queries.GetBooking
     {
         public long Id { get; set; }
     }
-    
+
     public class GetBookingQueryHandler : IRequestHandler<GetBookingQuery, BookingViewModel>
     {
         private readonly IApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IIdentityService _identityService;
 
-        public GetBookingQueryHandler(IApplicationDbContext context, IMapper mapper)
-        {
+        public GetBookingQueryHandler(IApplicationDbContext context, IMapper mapper, IIdentityService identityService)
+        { 
             _context = context;
             _mapper = mapper;
+            _identityService = identityService;
         }
 
         public async Task<BookingViewModel> Handle(GetBookingQuery request, CancellationToken cancellationToken)
         {
-            var entity = await _context.Bookings.FindAsync(request.Id, cancellationToken);
+            var entity = await _context.Bookings.Where(x => x.Id == request.Id)
+                .Include(e => e.ExtraClass)
+                .SingleOrDefaultAsync();
 
             if (entity == null)
             {

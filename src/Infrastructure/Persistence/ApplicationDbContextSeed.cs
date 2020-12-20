@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Identity;
 using System.Linq;
 using System.Threading.Tasks;
 using CrouseMath.Domain.Entities;
+using CrouseMath.Infrastructure.Services;
+using System;
 
 namespace CrouseMath.Infrastructure.Persistence
 {
@@ -22,36 +24,23 @@ namespace CrouseMath.Infrastructure.Persistence
         public static async Task SeedSampleDataAsync(ApplicationDbContext context)
         {
             // Seed, if necessary
-            if (!context.Students.Any())
+            if (!context.ExtraClasses.Any())
             {
-                context.Students.AddRange(new[]
-                {
-                    new Student {LastName = "Baggins", FirstName = "Frodo", Email = "fbaggins@theshire.com"},
-                    new Student {LastName = "Baggins", FirstName = "Bilbo", Email = "bbaggins@theshire,com"},
-                    new Student {LastName = "Gam Gee", FirstName = "Sam", Email = "sgamegee@theshire.com"},
-                    new Student {LastName = "BrandyBuck", FirstName = "Merry", Email = "mbrandybuck@theshire.com"}
-                });
-
                 context.Subjects.AddRange(new[]
                 {
                     new Subject {Name = "Magic"},
                     new Subject {Name = "Staff Logic"}
                 });
 
-                context.Teachers.AddRange(new[]
+                context.ExtraClasses.Add(new ExtraClass
                 {
-                    new Teacher
-                    {
-                        LastName = "The Grey",
-                        FirstName = "Gandalf",
-                        Email = "gandalf@wizzardcouncil.com",
-                    },
-                    new Teacher
-                    {
-                        LastName = "The White",
-                        FirstName = "Saruman",
-                        Email = "saurman@wizzardcouncil.com",
-                    }
+                    Name = "Math Algebra",
+                    Size = 5,
+                    SubjectId = 1,
+                    Date = DateTime.Now,
+                    Duration = new TimeSpan(1, 0, 0),
+                    IsClassFull = false,
+                    Price = 100,
                 });
 
                 await context.SaveChangesAsync();

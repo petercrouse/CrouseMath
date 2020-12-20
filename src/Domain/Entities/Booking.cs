@@ -6,11 +6,10 @@ namespace CrouseMath.Domain.Entities
     {
         public long Id { get; set; }
         public long ExtraClassId { get; set; }
-        public long StudentId { get; set; }
+        public string UserId { get; set; }
         public double BookingPrice { get; set; }
         public bool Paid { get; set; }
 
-        public Student Student { get; set; }
         public ExtraClass ExtraClass { get; set; }
     }
 }

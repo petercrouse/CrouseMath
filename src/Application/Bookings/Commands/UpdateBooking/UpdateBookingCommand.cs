@@ -44,9 +44,9 @@ namespace CrouseMath.Application.Bookings.Commands.UpdateBooking
                     throw new NotFoundException(nameof(ExtraClass), request.ExtraClassId);
                 }
 
-                if (extraClass.Bookings.Any(b => b.StudentId == entity.StudentId))
+                if (extraClass.Bookings.Any(b => b.UserId == entity.UserId))
                 {
-                    throw new DoubleBookingException(nameof(ExtraClass), request.ExtraClassId, entity.StudentId);
+                    throw new DoubleBookingException(nameof(ExtraClass), request.ExtraClassId, entity.UserId);
                 }
             }           
 

@@ -27,7 +27,7 @@ namespace CrouseMath.Application.Bookings.Queries.GetBookingList
         {
             return new BookingListViewModel
             {
-                Bookings = await _context.Bookings.ProjectTo<BookingLookup>(_mapper.ConfigurationProvider).ToListAsync(cancellationToken)
+                Bookings = await _context.Bookings.ProjectTo<BookingLookupDto>(_mapper.ConfigurationProvider).ToListAsync(cancellationToken)
             };
         }
     }

@@ -3,7 +3,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using CrouseMath.Application.Common.Exceptions;
-using CrouseMath.Application.Common.Extensions;
 using CrouseMath.Application.Common.Interfaces;
 using CrouseMath.Domain.Entities;
 
@@ -14,7 +13,7 @@ namespace CrouseMath.Application.ExtraClasses.Commands.UpdateExtraClass
         public long Id { get; set; }
         public string Name { get; set; }
         public DateTime Date { get; set; }
-        public long? TeacherId { get; set; }
+        public string TeacherId { get; set; }
         public int Size { get; set; }
         public TimeSpan Duration { get; set; }
         public long SubjectId { get; set; }
@@ -24,10 +23,12 @@ namespace CrouseMath.Application.ExtraClasses.Commands.UpdateExtraClass
     public class UpdateExtraClassCommandHandler : IRequestHandler<UpdateExtraClassCommand, Unit>
     {
         private readonly IApplicationDbContext _context;
+        private readonly IIdentityService _identityService;
 
-        public UpdateExtraClassCommandHandler(IApplicationDbContext context)
+        public UpdateExtraClassCommandHandler(IApplicationDbContext context, IIdentityService identityService)
         {
             _context = context;
+            _identityService = identityService;
         }
 
         public async Task<Unit> Handle(UpdateExtraClassCommand request, CancellationToken cancellationToken)
@@ -39,20 +40,13 @@ namespace CrouseMath.Application.ExtraClasses.Commands.UpdateExtraClass
                 throw new NotFoundException(nameof(ExtraClass), request.Id);
             }
 
-            Teacher teacher;
-
-            if (entity?.TeacherId != request?.TeacherId)
+            if (entity.TeacherId != request.TeacherId)
             {
-                teacher = await _context.Teachers.FindAsync(request.TeacherId, cancellationToken);
+                var user = await _identityService.GetUserNameAsync(request.TeacherId);
 
-                if (teacher == null)
+                if (user == null)
                 {
-                    throw new NotFoundException(nameof(Teacher), request.TeacherId);
-                }
-
-                if (!teacher.TeachSubject(request.SubjectId))
-                {
-                    throw new TeacherDoesNotTeachSubjectException(teacher.Id, request.SubjectId);
+                    throw new NotFoundException("Teacher", request.TeacherId);
                 }
             }
 

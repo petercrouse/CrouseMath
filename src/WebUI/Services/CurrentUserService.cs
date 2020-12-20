@@ -11,6 +11,6 @@ namespace CrouseMath.WebUI.Services
             UserId = httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
         }
 
-        public string UserId { get; }
+        public string UserId { get; private set; }
     }
 }

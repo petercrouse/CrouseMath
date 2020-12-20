@@ -1,9 +1,6 @@
 ﻿using AutoMapper;
 using CrouseMath.Application.Common.Mappings;
-using System;
-using CrouseMath.Application.Students.Queries.GetStudent;
-using CrouseMath.Domain.Entities;
-using Xunit;
+using NUnit.Framework;
 
 namespace CrouseMath.Application.UnitTests.Common.Mappings
 {
@@ -22,7 +19,7 @@ namespace CrouseMath.Application.UnitTests.Common.Mappings
             _mapper = _configuration.CreateMapper();
         }
 
-        [Fact]
+        [Test]
         public void ShouldHaveValidConfiguration()
         {
             _configuration.AssertConfigurationIsValid();
