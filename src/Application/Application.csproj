@@ -21,7 +21,6 @@
 
   <ItemGroup>
     <Folder Include="Common\Extensions\" />
-    <Folder Include="Common\Mappings\" />
   </ItemGroup>
 
 </Project>

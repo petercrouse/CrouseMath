@@ -10,7 +10,7 @@ namespace CrouseMath.Application.ExtraClasses.Commands.UpdateExtraClass
         {
             RuleFor(x => x.Id).GreaterThan(0);
             RuleFor(x => x.Name).NotEmpty();
-            RuleFor(x => x.Date).GreaterThanOrEqualTo(dateTime.Now);
+            RuleFor(x => x.Date).GreaterThanOrEqualTo(dateTime.Now.AddMinutes(-30));
             RuleFor(x => x.Size).GreaterThanOrEqualTo(0);
             RuleFor(x => x.Duration).GreaterThanOrEqualTo(new TimeSpan(0, 30, 0));
             RuleFor(x => x.Price).GreaterThanOrEqualTo(0);

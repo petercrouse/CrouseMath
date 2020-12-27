@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CrouseMath.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200811160649_extraclasses")]
-    partial class extraclasses
+    [Migration("20201220120456_initial")]
+    partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -24,7 +24,9 @@ namespace CrouseMath.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("CrouseMath.Domain.Entities.Booking", b =>
                 {
                     b.Property<long>("Id")
-                        .HasColumnType("bigint");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<decimal>("BookingPrice")
                         .HasColumnType("money");
@@ -47,10 +49,12 @@ namespace CrouseMath.Infrastructure.Persistence.Migrations
                     b.Property<bool>("Paid")
                         .HasColumnType("bit");
 
-                    b.Property<long>("StudentId")
-                        .HasColumnType("bigint");
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ExtraClassId");
 
                     b.ToTable("Booking");
                 });
@@ -58,7 +62,9 @@ namespace CrouseMath.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("CrouseMath.Domain.Entities.ExtraClass", b =>
                 {
                     b.Property<long>("Id")
-                        .HasColumnType("bigint");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
@@ -95,53 +101,14 @@ namespace CrouseMath.Infrastructure.Persistence.Migrations
                     b.Property<long>("SubjectId")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("TeacherId")
-                        .HasColumnType("bigint");
+                    b.Property<string>("TeacherId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TeacherId");
+                    b.HasIndex("SubjectId");
 
                     b.ToTable("ExtraClass");
-                });
-
-            modelBuilder.Entity("CrouseMath.Domain.Entities.Student", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(20)")
-                        .HasMaxLength(20);
-
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(20)")
-                        .HasMaxLength(20);
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Student");
                 });
 
             modelBuilder.Entity("CrouseMath.Domain.Entities.Subject", b =>
@@ -171,54 +138,6 @@ namespace CrouseMath.Infrastructure.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Subject");
-                });
-
-            modelBuilder.Entity("CrouseMath.Domain.Entities.Teacher", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FirstName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LastName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Teacher");
-                });
-
-            modelBuilder.Entity("CrouseMath.Domain.Entities.TeacherSubject", b =>
-                {
-                    b.Property<long>("TeacherId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("SubjectId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("TeacherId", "SubjectId");
-
-                    b.HasIndex("SubjectId");
-
-                    b.ToTable("TeacherSubject");
                 });
 
             modelBuilder.Entity("CrouseMath.Infrastructure.Identity.ApplicationUser", b =>
@@ -507,13 +426,7 @@ namespace CrouseMath.Infrastructure.Persistence.Migrations
                 {
                     b.HasOne("CrouseMath.Domain.Entities.ExtraClass", "ExtraClass")
                         .WithMany("Bookings")
-                        .HasForeignKey("Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CrouseMath.Domain.Entities.Student", "Student")
-                        .WithMany("Bookings")
-                        .HasForeignKey("Id")
+                        .HasForeignKey("ExtraClassId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -521,27 +434,8 @@ namespace CrouseMath.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("CrouseMath.Domain.Entities.ExtraClass", b =>
                 {
                     b.HasOne("CrouseMath.Domain.Entities.Subject", "Subject")
-                        .WithMany()
-                        .HasForeignKey("Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CrouseMath.Domain.Entities.Teacher", "Teacher")
-                        .WithMany("TeachingClasses")
-                        .HasForeignKey("TeacherId");
-                });
-
-            modelBuilder.Entity("CrouseMath.Domain.Entities.TeacherSubject", b =>
-                {
-                    b.HasOne("CrouseMath.Domain.Entities.Subject", "Subject")
-                        .WithMany()
+                        .WithMany("ExtraClasses")
                         .HasForeignKey("SubjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CrouseMath.Domain.Entities.Teacher", "Teacher")
-                        .WithMany("TeachingSubjects")
-                        .HasForeignKey("TeacherId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

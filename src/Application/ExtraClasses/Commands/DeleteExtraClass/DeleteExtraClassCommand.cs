@@ -24,7 +24,7 @@ namespace CrouseMath.Application.ExtraClasses.Commands.DeleteExtraClass
 
             public async Task<Unit> Handle(DeleteExtraClassCommand request, CancellationToken cancellationToken)
             {
-                var entity = await _context.ExtraClasses.FindAsync(request.Id, cancellationToken);
+                var entity = await _context.ExtraClasses.FindAsync(request.Id);
 
                 if (entity == null)
                 {

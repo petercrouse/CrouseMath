@@ -1,17 +1,15 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
 using CrouseMath.Application.Bookings.Commands.CreateBooking;
 using CrouseMath.Application.Common.Exceptions;
 using CrouseMath.Application.ExtraClasses.Commands.CreateExtraClass;
 using CrouseMath.Application.ExtraClasses.Commands.UpdateExtraClass;
-using CrouseMath.Application.IntegrationTests;
 using CrouseMath.Application.Subjects.Commands.CreateSubject;
 using CrouseMath.Domain.Entities;
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace CrouseMath.Application.UnitTests.ExtraClasses.Commands.UpdateExtraClass
+namespace CrouseMath.Application.IntegrationTests.ExtraClasses.Commands.UpdateExtraClass
 {
     using static Testing;
 
@@ -27,7 +25,7 @@ namespace CrouseMath.Application.UnitTests.ExtraClasses.Commands.UpdateExtraClas
             var size = 3;
             var price = 100;
 
-            var teacherId = await RunAsUserAsync("teacher@local", "teacher1234!");
+            var teacherId = await RunAsUserAsync("teacher@local", "Teacher1234!");
 
             var subjectId = await SendAsync(new CreateSubjectCommand { Name = "StaffLogic" });
             var extraClassId = await SendAsync(new CreateExtraClassCommand
@@ -89,7 +87,7 @@ namespace CrouseMath.Application.UnitTests.ExtraClasses.Commands.UpdateExtraClas
         [Test]
         public async Task UpdateExtraClass_GivenSuccessfulValidation_TeacherNotFound_ShouldThrowNotFoundException()
         {
-            var teacherId = await RunAsUserAsync("teacher@local", "teacher1234!");
+            var teacherId = await RunAsUserAsync("teacher@local", "Teacher1234!");
 
             var subjectId = await SendAsync(new CreateSubjectCommand { Name = "StaffLogic" });
             var extraClassId = await SendAsync(new CreateExtraClassCommand
@@ -110,7 +108,7 @@ namespace CrouseMath.Application.UnitTests.ExtraClasses.Commands.UpdateExtraClas
                 Name = "StaffLogic",
                 Price = 100,
                 Size = 2,
-                TeacherId = "boop@local"
+                TeacherId = Guid.NewGuid().ToString()
             };
 
             // Assert
@@ -128,9 +126,8 @@ namespace CrouseMath.Application.UnitTests.ExtraClasses.Commands.UpdateExtraClas
             var size = 3;
             var price = 100;
 
-            var teacherId = await RunAsUserAsync("teacher@local", "teacher1234!");
-
-            var subjectId = await SendAsync(new CreateSubjectCommand { Name = "StaffLogic" });
+            var teacherId = await RunAsUserAsync("teacher@local", "Teacher1234!");
+            var subjectId = await SendAsync(new CreateSubjectCommand { Name = "Wizardry" });
             var extraClassId = await SendAsync(new CreateExtraClassCommand
             {
                 SubjectId = subjectId,
@@ -143,7 +140,7 @@ namespace CrouseMath.Application.UnitTests.ExtraClasses.Commands.UpdateExtraClas
 
             await SendAsync(new CreateBookingCommand { ExtraClassId = extraClassId});
 
-            await RunAsDefaultUserAsync();
+            await RunAsUserAsync("student@local", "Student1234!");
 
             await SendAsync(new CreateBookingCommand { ExtraClassId = extraClassId });
 

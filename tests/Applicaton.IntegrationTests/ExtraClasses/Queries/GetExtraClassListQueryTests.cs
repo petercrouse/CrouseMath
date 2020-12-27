@@ -1,17 +1,12 @@
-﻿using System.Linq;
-using AutoMapper;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using CrouseMath.Application.ExtraClasses.Queries.GetExtraClassList;
-using CrouseMath.Infrastructure.Persistence;
-using CrouseMath.Application.IntegrationTests;
 using NUnit.Framework;
 using CrouseMath.Domain.Entities;
 using System;
 using FluentAssertions;
 using CrouseMath.Application.Subjects.Commands.CreateSubject;
 
-namespace CrouseMath.Application.UnitTests.ExtraClasses.Queries
+namespace CrouseMath.Application.IntegrationTests.ExtraClasses.Queries
 {
     using static Testing;
     public class GetExtraClassListQueryTests : TestBase

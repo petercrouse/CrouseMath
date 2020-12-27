@@ -39,9 +39,12 @@ namespace CrouseMath.Application.Bookings.Queries.GetBooking
                 throw new NotFoundException(nameof(Booking), request.Id);
             }
 
+            var booking = _mapper.Map<BookingDto>(entity);
+            booking.UserName = await _identityService.GetUserNameAsync(booking.UserId);
+
             return new BookingViewModel
             {
-                Booking = _mapper.Map<BookingDto>(entity)
+                Booking = booking
             };
         }
     }

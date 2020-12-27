@@ -1,16 +1,12 @@
-﻿using AutoMapper;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using CrouseMath.Application.ExtraClasses.Queries.GetExtraClass;
-using CrouseMath.Infrastructure.Persistence;
-using CrouseMath.Application.IntegrationTests;
 using NUnit.Framework;
 using CrouseMath.Application.Subjects.Commands.CreateSubject;
 using System;
 using CrouseMath.Application.ExtraClasses.Commands.CreateExtraClass;
 using FluentAssertions;
 
-namespace CrouseMath.Application.UnitTests.ExtraClasses.Queries
+namespace CrouseMath.Application.IntegrationTests.ExtraClasses.Queries
 {
     using static Testing;
 
@@ -26,7 +22,7 @@ namespace CrouseMath.Application.UnitTests.ExtraClasses.Queries
             var size = 3;
             var price = 100;
 
-            var teacherId = await RunAsUserAsync("teacher@local", "teacher1234!");
+            var teacherId = await RunAsUserAsync("teacher@local", "Teacher1234!");
 
             var subjectId = await SendAsync(new CreateSubjectCommand { Name = "StaffLogic" });
             var extraClassId = await SendAsync(new CreateExtraClassCommand
@@ -46,6 +42,7 @@ namespace CrouseMath.Application.UnitTests.ExtraClasses.Queries
             result.Should().BeOfType<ExtraClassViewModel>();
             result.ExtraClass.Id.Should().Be(extraClassId);
             result.ExtraClass.Name.Should().Be(name);
+            result.ExtraClass.TeacherId.Should().Be(teacherId);
         }
     }
 }

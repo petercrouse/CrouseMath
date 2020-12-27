@@ -4,14 +4,14 @@ using CrouseMath.Domain.Entities;
 
 namespace CrouseMath.Application.ExtraClasses.Queries.GetExtraClassList
 {
-    public class ExtraClassLookup : IMapFrom<ExtraClass>
+    public class ExtraClassLookupDto : IMapFrom<ExtraClass>
     {
         public long Id { get; set; }
         public string Name { get; set; }
 
         public void Mapping(Profile profile)
         {
-            profile.CreateMap<ExtraClass, ExtraClassLookup>();
+            profile.CreateMap<ExtraClass, ExtraClassLookupDto>();
         }
     }
 }

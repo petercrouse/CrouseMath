@@ -1,6 +1,5 @@
 ﻿using CrouseMath.Application.Common.Exceptions;
 using CrouseMath.Application.ExtraClasses.Commands.CreateExtraClass;
-using CrouseMath.Application.IntegrationTests;
 using CrouseMath.Application.Subjects.Commands.CreateSubject;
 using CrouseMath.Application.Subjects.Commands.DeleteSubject;
 using CrouseMath.Domain.Entities;
@@ -9,7 +8,7 @@ using NUnit.Framework;
 using System;
 using System.Threading.Tasks;
 
-namespace CrouseMath.Application.UnitTests.Subjects.Commands.DeleteSubject
+namespace CrouseMath.Application.IntegrationTests.Subjects.Commands.DeleteSubject
 {
     using static Testing;
 

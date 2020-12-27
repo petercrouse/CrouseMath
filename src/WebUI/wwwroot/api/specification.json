@@ -527,7 +527,11 @@
             "type": "integer",
             "format": "int64"
           },
-          "userFullName": {
+          "userId": {
+            "type": "string",
+            "nullable": true
+          },
+          "userName": {
             "type": "string",
             "nullable": true
           },
@@ -571,14 +575,14 @@
             "type": "string",
             "nullable": true
           },
-          "userFullName": {
+          "userName": {
             "type": "string",
             "nullable": true
           },
           "paid": {
             "type": "boolean"
           },
-          "price": {
+          "bookingPrice": {
             "type": "number",
             "format": "double"
           }
@@ -655,12 +659,12 @@
             "type": "array",
             "nullable": true,
             "items": {
-              "$ref": "#/components/schemas/ExtraClassLookup"
+              "$ref": "#/components/schemas/ExtraClassLookupDto"
             }
           }
         }
       },
-      "ExtraClassLookup": {
+      "ExtraClassLookupDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {

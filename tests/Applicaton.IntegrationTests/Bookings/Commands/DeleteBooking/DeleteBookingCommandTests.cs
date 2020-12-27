@@ -1,19 +1,19 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
 using CrouseMath.Application.Bookings.Commands.CreateBooking;
 using CrouseMath.Application.Bookings.Commands.DeleteBooking;
 using CrouseMath.Application.Common.Exceptions;
-using CrouseMath.Application.IntegrationTests;
+using CrouseMath.Application.ExtraClasses.Commands.CreateExtraClass;
+using CrouseMath.Application.Subjects.Commands.CreateSubject;
 using CrouseMath.Domain.Entities;
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace CrouseMath.Application.UnitTests.Bookings.Commands.DeleteBooking
+namespace CrouseMath.Application.IntegrationTests.Bookings.Commands.DeleteBooking
 {
     using static Testing;
 
-    public class DeleteBookingCommandTests: TestBase
+    public class DeleteBookingCommandTests : TestBase
     {
         [Test]
         public void DeleteBookingCommand_ShouldThrowNotFoundException()
@@ -21,28 +21,25 @@ namespace CrouseMath.Application.UnitTests.Bookings.Commands.DeleteBooking
             var command = new DeleteBookingCommand { Id = 99 };
 
             FluentActions.Invoking(() =>
-                SendAsync(command)).Should().Throw<DeleteFailureException>();
+                SendAsync(command)).Should().Throw<NotFoundException>();
         }
 
         [Test]
         public async Task DeleteBookingCommand_ShouldDeleteSuccessfully()
         {
-            await AddAsync(new Subject { Name = "Math" });
-
-            await AddAsync(new ExtraClass
+            await RunAsDefaultUserAsync();
+            var subjectId = await SendAsync(new CreateSubjectCommand { Name = "Wizardry" });
+            var extraClassId = await SendAsync(new CreateExtraClassCommand
             {
-                Name = "Math Algebra",
-                Size = 5,
-                SubjectId = 1,
+                Name = "Gandalf's class",
+                SubjectId = subjectId,
+                Size = 1,
+                Price = 500,
+                Duration = TimeSpan.FromMinutes(60),
                 Date = DateTime.Now,
-                Duration = new TimeSpan(1, 0, 0),
-                IsClassFull = false,
-                Price = 100,
             });
 
-            var command = new CreateBookingCommand { ExtraClassId = 1 };
-
-            var bookingId = await SendAsync(command);
+            var bookingId = await SendAsync(new CreateBookingCommand { ExtraClassId = extraClassId });
 
             await SendAsync(new DeleteBookingCommand { Id = bookingId });
 

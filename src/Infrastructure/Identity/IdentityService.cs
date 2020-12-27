@@ -1,5 +1,6 @@
 ﻿using CrouseMath.Application.Common.Interfaces;
 using CrouseMath.Application.Common.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -10,17 +11,17 @@ namespace CrouseMath.Infrastructure.Identity
     public class IdentityService : IIdentityService
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IUserClaimsPrincipalFactory<ApplicationUser> _userClaimsPrincipalFactory;
+        private readonly IAuthorizationService _authorizationService;
 
-        public IdentityService(UserManager<ApplicationUser> userManager)
+        public IdentityService(
+            UserManager<ApplicationUser> userManager,
+            IUserClaimsPrincipalFactory<ApplicationUser> userClaimsPrincipalFactory,
+            IAuthorizationService authorizationService)
         {
             _userManager = userManager;
-        }
-
-        public string GetUserName(string userId)
-        {
-            var user = _userManager.Users.First(u => u.Id == userId);
-
-            return user.UserName;
+            _userClaimsPrincipalFactory = userClaimsPrincipalFactory;
+            _authorizationService = authorizationService;
         }
 
         public async Task<string> GetUserNameAsync(string userId)
@@ -43,6 +44,24 @@ namespace CrouseMath.Infrastructure.Identity
             return (result.ToApplicationResult(), user.Id);
         }
 
+        public async Task<bool> IsInRoleAsync(string userId, string role)
+        {
+            var user = _userManager.Users.SingleOrDefault(u => u.Id == userId);
+
+            return await _userManager.IsInRoleAsync(user, role);
+        }
+
+        public async Task<bool> AuthorizeAsync(string userId, string policyName)
+        {
+            var user = _userManager.Users.SingleOrDefault(u => u.Id == userId);
+
+            var principal = await _userClaimsPrincipalFactory.CreateAsync(user);
+
+            var result = await _authorizationService.AuthorizeAsync(principal, policyName);
+
+            return result.Succeeded;
+        }
+
         public async Task<Result> DeleteUserAsync(string userId)
         {
             var user = _userManager.Users.SingleOrDefault(u => u.Id == userId);
@@ -60,6 +79,13 @@ namespace CrouseMath.Infrastructure.Identity
             var result = await _userManager.DeleteAsync(user);
 
             return result.ToApplicationResult();
+        }
+
+        public async Task<bool> DoesUserExist(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+            return user != null;
         }
     }
 }

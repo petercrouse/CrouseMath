@@ -1,17 +1,13 @@
-﻿using System.Linq;
-using AutoMapper;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using CrouseMath.Application.Bookings.Queries.GetBookingList;
-using CrouseMath.Infrastructure.Persistence;
-using CrouseMath.Application.IntegrationTests;
 using NUnit.Framework;
 using CrouseMath.Domain.Entities;
 using System;
-using CrouseMath.Application.Bookings.Commands.CreateBooking;
 using FluentAssertions;
+using CrouseMath.Application.Subjects.Commands.CreateSubject;
+using CrouseMath.Application.ExtraClasses.Commands.CreateExtraClass;
 
-namespace CrouseMath.Application.UnitTests.Bookings.Queries
+namespace CrouseMath.Application.IntegrationTests.Bookings.Queries
 {
     using static Testing;
 
@@ -20,30 +16,32 @@ namespace CrouseMath.Application.UnitTests.Bookings.Queries
         [Test]
         public async Task GetBookingList()
         {
-            await AddAsync(new ExtraClass
+            var userId = await RunAsDefaultUserAsync();
+            var subjectId = await SendAsync(new CreateSubjectCommand { Name = "Wizardry" });
+            var extraClassId = await SendAsync(new CreateExtraClassCommand
             {
                 Name = "Gandalf's class",
+                SubjectId = subjectId,
                 Size = 1,
                 Price = 500,
                 Duration = TimeSpan.FromMinutes(60),
                 Date = DateTime.Now,
-                IsClassFull = false
             });
 
             await AddAsync(new Booking
             {
-                ExtraClassId = 1,
+                ExtraClassId = extraClassId,
                 Paid = false,
                 BookingPrice = 500,
-                UserId = "11111"
+                UserId = userId
             });
 
             await AddAsync(new Booking
             {
-                ExtraClassId = 1,
+                ExtraClassId = extraClassId,
                 Paid = false,
                 BookingPrice = 500,
-                UserId = "22222"
+                UserId = userId
             });
 
             var query = new GetBookingListQuery();

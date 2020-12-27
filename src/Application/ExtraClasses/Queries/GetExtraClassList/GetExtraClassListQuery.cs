@@ -25,7 +25,7 @@ namespace CrouseMath.Application.ExtraClasses.Queries.GetExtraClassList
             {
                 return new ExtraClassListViewModel
                 {
-                    ExtraClasses = await _context.ExtraClasses.ProjectTo<ExtraClassLookup>(_mapper.ConfigurationProvider).ToListAsync(cancellationToken)
+                    ExtraClasses = await _context.ExtraClasses.ProjectTo<ExtraClassLookupDto>(_mapper.ConfigurationProvider).ToListAsync(cancellationToken)
                 };
             }
         }

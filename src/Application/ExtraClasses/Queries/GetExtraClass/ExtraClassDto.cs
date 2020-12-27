@@ -25,23 +25,7 @@ namespace CrouseMath.Application.ExtraClasses.Queries.GetExtraClass
             configuration.CreateMap<ExtraClass, ExtraClassDto>()
                 .ForMember(d => d.Id, opt => opt.MapFrom(c => c.Id))
                 .ForMember(d => d.SubjectName, opt => opt.MapFrom(c => c.Subject.Name))
-                .ForMember(d => d.TeacherName, opt => opt.MapFrom<ExtraClassDtoTeacherNameResolver>());
-                    
-        }
-    }
-
-    public class ExtraClassDtoTeacherNameResolver : IValueResolver<ExtraClass, ExtraClassDto, string>
-    {
-        private readonly IIdentityService _identityService;
-
-        public ExtraClassDtoTeacherNameResolver(IIdentityService identityService)
-        {
-            _identityService = identityService;
-        }
-
-        public string Resolve(ExtraClass source, ExtraClassDto destination, string destMember, ResolutionContext context)
-        {
-            return _identityService.GetUserName(source.TeacherId);
+                .ForMember(d => d.TeacherName, opt => opt.Ignore());          
         }
     }
 }

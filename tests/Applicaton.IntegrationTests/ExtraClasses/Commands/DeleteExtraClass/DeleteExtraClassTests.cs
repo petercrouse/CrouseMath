@@ -1,20 +1,15 @@
-﻿using MediatR;
-using Moq;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using CrouseMath.Application.Common.Exceptions;
 using CrouseMath.Application.ExtraClasses.Commands.DeleteExtraClass;
-using CrouseMath.Application.IntegrationTests;
 using NUnit.Framework;
 using FluentAssertions;
 using CrouseMath.Domain.Entities;
 using System;
-using System.Collections.Generic;
 using CrouseMath.Application.ExtraClasses.Commands.CreateExtraClass;
 using CrouseMath.Application.Bookings.Commands.CreateBooking;
 using CrouseMath.Application.Subjects.Commands.CreateSubject;
 
-namespace CrouseMath.Application.UnitTests.ExtraClasses.Commands.DeleteExtraClass
+namespace CrouseMath.Application.IntegrationTests.ExtraClasses.Commands.DeleteExtraClass
 {
     using static Testing;
 

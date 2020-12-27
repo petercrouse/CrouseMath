@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using CrouseMath.Application.Common.Exceptions;
 using CrouseMath.Application.Common.Interfaces;
 using CrouseMath.Domain.Entities;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace CrouseMath.Application.ExtraClasses.Commands.UpdateExtraClass
 {
@@ -33,7 +35,9 @@ namespace CrouseMath.Application.ExtraClasses.Commands.UpdateExtraClass
 
         public async Task<Unit> Handle(UpdateExtraClassCommand request, CancellationToken cancellationToken)
         {
-            var entity = await _context.ExtraClasses.FindAsync(request.Id, cancellationToken);
+            var entity = await _context.ExtraClasses.Where(x => x.Id == request.Id)
+                .Include(b => b.Bookings)
+                .SingleOrDefaultAsync();
 
             if (entity == null)
             {
@@ -42,9 +46,7 @@ namespace CrouseMath.Application.ExtraClasses.Commands.UpdateExtraClass
 
             if (entity.TeacherId != request.TeacherId)
             {
-                var user = await _identityService.GetUserNameAsync(request.TeacherId);
-
-                if (user == null)
+                if (!await _identityService.DoesUserExist(request.TeacherId))
                 {
                     throw new NotFoundException("Teacher", request.TeacherId);
                 }

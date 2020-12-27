@@ -1,10 +1,12 @@
-﻿using System.Threading;
+﻿using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using CrouseMath.Application.Common.Exceptions;
 using CrouseMath.Application.Common.Interfaces;
 using CrouseMath.Domain.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace CrouseMath.Application.ExtraClasses.Queries.GetExtraClass
 {
@@ -17,26 +19,32 @@ namespace CrouseMath.Application.ExtraClasses.Queries.GetExtraClass
     {
         private readonly IApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IIdentityService _identityService;
 
-        public GetExtraClassQueryHandler(IApplicationDbContext context, IMapper mapper)
+        public GetExtraClassQueryHandler(IApplicationDbContext context, IMapper mapper, IIdentityService identityService)
         {
             _context = context;
             _mapper = mapper;
+            _identityService = identityService;
         }
 
         public async Task<ExtraClassViewModel> Handle(GetExtraClassQuery request,
             CancellationToken cancellationToken)
         {
-            var entity = await _context.ExtraClasses.FindAsync(request.Id, cancellationToken);
+            var entity = await _context.ExtraClasses.Where(x => x.Id == request.Id)
+                .SingleOrDefaultAsync(cancellationToken);
 
             if (entity == null)
             {
                 throw new NotFoundException(nameof(ExtraClass), request.Id);
             }
 
+            var extraClass = _mapper.Map<ExtraClassDto>(entity);
+            extraClass.TeacherName = await _identityService.GetUserNameAsync(extraClass.TeacherId);
+
             return new ExtraClassViewModel
             {
-                ExtraClass = _mapper.Map<ExtraClassDto>(entity)
+                ExtraClass = extraClass
             };
         }
     }

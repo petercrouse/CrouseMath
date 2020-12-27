@@ -1,11 +1,10 @@
 ﻿using System.Threading.Tasks;
-using CrouseMath.Application.IntegrationTests;
 using CrouseMath.Application.Subjects.Queries.GetSubjects;
 using CrouseMath.Domain.Entities;
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace CrouseMath.Application.UnitTests.Subjects.Queries
+namespace CrouseMath.Application.IntegrationTests.Subjects.Queries
 {
     using static Testing;
 

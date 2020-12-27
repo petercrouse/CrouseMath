@@ -1,38 +1,36 @@
-﻿using AutoMapper;
-using CrouseMath.Application.Bookings.Commands.CreateBooking;
+﻿using CrouseMath.Application.Bookings.Commands.CreateBooking;
 using CrouseMath.Application.Bookings.Queries.GetBooking;
 using CrouseMath.Application.Common.Exceptions;
-using CrouseMath.Domain.Entities;
+using CrouseMath.Application.ExtraClasses.Commands.CreateExtraClass;
+using CrouseMath.Application.Subjects.Commands.CreateSubject;
 using FluentAssertions;
 using NUnit.Framework;
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
-namespace CrouseMath.Application.UnitTests.Bookings.Queries
+namespace CrouseMath.Application.IntegrationTests.Bookings.Queries
 {
     using static Testing;
 
-    public class GetBookingQueryTests
+    public class GetBookingQueryTests : TestBase
     {
         [Test]
         public async Task GetBooking()
         {
             var userId = await RunAsDefaultUserAsync();
-
             var className = "Gandalf's class";
-
-            await AddAsync(new ExtraClass
+            var subjectId = await SendAsync(new CreateSubjectCommand { Name = "Wizardry" });
+            var extraClassId = await SendAsync(new CreateExtraClassCommand
             {
                 Name = className,
+                SubjectId = subjectId,
                 Size = 1,
                 Price = 500,
                 Duration = TimeSpan.FromMinutes(60),
                 Date = DateTime.Now,
-                IsClassFull = false
             });
 
-            var bookingId = await SendAsync(new CreateBookingCommand { ExtraClassId = 1 });
+            var bookingId = await SendAsync(new CreateBookingCommand { ExtraClassId = extraClassId });
 
             var result = await SendAsync(new GetBookingQuery { Id = bookingId });
 

@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
 using CrouseMath.Application.Common.Exceptions;
-using CrouseMath.Application.IntegrationTests;
 using CrouseMath.Application.Subjects.Commands.CreateSubject;
 using CrouseMath.Application.Subjects.Commands.UpdateSubject;
 using CrouseMath.Domain.Entities;
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace CrouseMath.Application.UnitTests.Subjects.Commands.UpdateSubject
+namespace CrouseMath.Application.IntegrationTests.Subjects.Commands.UpdateSubject
 {
     using static Testing;
 
@@ -36,6 +35,7 @@ namespace CrouseMath.Application.UnitTests.Subjects.Commands.UpdateSubject
 
             var command = new UpdateSubjectCommand
             {
+                Id = subjectId,
                 Name = "VoidMagic"
             };
 

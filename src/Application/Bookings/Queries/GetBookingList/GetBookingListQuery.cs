@@ -16,18 +16,28 @@ namespace CrouseMath.Application.Bookings.Queries.GetBookingList
     {
         private readonly IApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IIdentityService _identityService;
 
-        public GetBookingsQueryHandler(IApplicationDbContext context, IMapper mapper)
+        public GetBookingsQueryHandler(IApplicationDbContext context, IMapper mapper, IIdentityService identityService)
         {
             _context = context;
             _mapper = mapper;
+            _identityService = identityService;
         }
 
         public async Task<BookingListViewModel> Handle(GetBookingListQuery request, CancellationToken cancellationToken)
         {
+            var bookings = await _context.Bookings.ProjectTo<BookingLookupDto>(_mapper.ConfigurationProvider)
+                                                  .ToListAsync(cancellationToken);
+
+            foreach (var booking in bookings)
+            {
+                booking.UserName = await _identityService.GetUserNameAsync(booking.UserId);
+            }
+
             return new BookingListViewModel
             {
-                Bookings = await _context.Bookings.ProjectTo<BookingLookupDto>(_mapper.ConfigurationProvider).ToListAsync(cancellationToken)
+                Bookings = bookings
             };
         }
     }

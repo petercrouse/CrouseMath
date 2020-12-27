@@ -1,12 +1,11 @@
 ﻿using CrouseMath.Application.Common.Exceptions;
-using CrouseMath.Application.IntegrationTests;
 using CrouseMath.Application.Subjects.Commands.CreateSubject;
 using CrouseMath.Domain.Entities;
 using FluentAssertions;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
-namespace CrouseMath.Application.UnitTests.Subjects.Commands.CreateSubject
+namespace CrouseMath.Application.IntegrationTests.Subjects.Commands.CreateSubject
 {
     using static Testing;
 

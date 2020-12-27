@@ -4,6 +4,6 @@ namespace CrouseMath.Application.ExtraClasses.Queries.GetExtraClassList
 {
     public class ExtraClassListViewModel
     {
-        public IEnumerable<ExtraClassLookup> ExtraClasses { get; set; }
+        public IEnumerable<ExtraClassLookupDto> ExtraClasses { get; set; }
     }
 }

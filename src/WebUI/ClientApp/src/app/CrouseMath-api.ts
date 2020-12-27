@@ -906,7 +906,8 @@ export interface IBookingListViewModel {
 
 export class BookingLookupDto implements IBookingLookupDto {
     id?: number;
-    userFullName?: string | undefined;
+    userId?: string | undefined;
+    userName?: string | undefined;
     extraClassName?: string | undefined;
 
     constructor(data?: IBookingLookupDto) {
@@ -921,7 +922,8 @@ export class BookingLookupDto implements IBookingLookupDto {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
-            this.userFullName = _data["userFullName"];
+            this.userId = _data["userId"];
+            this.userName = _data["userName"];
             this.extraClassName = _data["extraClassName"];
         }
     }
@@ -936,7 +938,8 @@ export class BookingLookupDto implements IBookingLookupDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
-        data["userFullName"] = this.userFullName;
+        data["userId"] = this.userId;
+        data["userName"] = this.userName;
         data["extraClassName"] = this.extraClassName;
         return data; 
     }
@@ -944,7 +947,8 @@ export class BookingLookupDto implements IBookingLookupDto {
 
 export interface IBookingLookupDto {
     id?: number;
-    userFullName?: string | undefined;
+    userId?: string | undefined;
+    userName?: string | undefined;
     extraClassName?: string | undefined;
 }
 
@@ -989,9 +993,9 @@ export class BookingDto implements IBookingDto {
     extraClassId?: number;
     extraClassName?: string | undefined;
     userId?: string | undefined;
-    userFullName?: string | undefined;
+    userName?: string | undefined;
     paid?: boolean;
-    price?: number;
+    bookingPrice?: number;
 
     constructor(data?: IBookingDto) {
         if (data) {
@@ -1008,9 +1012,9 @@ export class BookingDto implements IBookingDto {
             this.extraClassId = _data["extraClassId"];
             this.extraClassName = _data["extraClassName"];
             this.userId = _data["userId"];
-            this.userFullName = _data["userFullName"];
+            this.userName = _data["userName"];
             this.paid = _data["paid"];
-            this.price = _data["price"];
+            this.bookingPrice = _data["bookingPrice"];
         }
     }
 
@@ -1027,9 +1031,9 @@ export class BookingDto implements IBookingDto {
         data["extraClassId"] = this.extraClassId;
         data["extraClassName"] = this.extraClassName;
         data["userId"] = this.userId;
-        data["userFullName"] = this.userFullName;
+        data["userName"] = this.userName;
         data["paid"] = this.paid;
-        data["price"] = this.price;
+        data["bookingPrice"] = this.bookingPrice;
         return data; 
     }
 }
@@ -1039,9 +1043,9 @@ export interface IBookingDto {
     extraClassId?: number;
     extraClassName?: string | undefined;
     userId?: string | undefined;
-    userFullName?: string | undefined;
+    userName?: string | undefined;
     paid?: boolean;
-    price?: number;
+    bookingPrice?: number;
 }
 
 export class CreateBookingCommand implements ICreateBookingCommand {
@@ -1197,7 +1201,7 @@ export interface IUpdateBookingCommand {
 }
 
 export class ExtraClassListViewModel implements IExtraClassListViewModel {
-    extraClasses?: ExtraClassLookup[] | undefined;
+    extraClasses?: ExtraClassLookupDto[] | undefined;
 
     constructor(data?: IExtraClassListViewModel) {
         if (data) {
@@ -1213,7 +1217,7 @@ export class ExtraClassListViewModel implements IExtraClassListViewModel {
             if (Array.isArray(_data["extraClasses"])) {
                 this.extraClasses = [] as any;
                 for (let item of _data["extraClasses"])
-                    this.extraClasses!.push(ExtraClassLookup.fromJS(item));
+                    this.extraClasses!.push(ExtraClassLookupDto.fromJS(item));
             }
         }
     }
@@ -1237,14 +1241,14 @@ export class ExtraClassListViewModel implements IExtraClassListViewModel {
 }
 
 export interface IExtraClassListViewModel {
-    extraClasses?: ExtraClassLookup[] | undefined;
+    extraClasses?: ExtraClassLookupDto[] | undefined;
 }
 
-export class ExtraClassLookup implements IExtraClassLookup {
+export class ExtraClassLookupDto implements IExtraClassLookupDto {
     id?: number;
     name?: string | undefined;
 
-    constructor(data?: IExtraClassLookup) {
+    constructor(data?: IExtraClassLookupDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -1260,9 +1264,9 @@ export class ExtraClassLookup implements IExtraClassLookup {
         }
     }
 
-    static fromJS(data: any): ExtraClassLookup {
+    static fromJS(data: any): ExtraClassLookupDto {
         data = typeof data === 'object' ? data : {};
-        let result = new ExtraClassLookup();
+        let result = new ExtraClassLookupDto();
         result.init(data);
         return result;
     }
@@ -1275,7 +1279,7 @@ export class ExtraClassLookup implements IExtraClassLookup {
     }
 }
 
-export interface IExtraClassLookup {
+export interface IExtraClassLookupDto {
     id?: number;
     name?: string | undefined;
 }

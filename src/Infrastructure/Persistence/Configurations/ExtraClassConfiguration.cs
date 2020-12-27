@@ -25,14 +25,6 @@ namespace CrouseMath.Infrastructure.Persistence.Configurations
             builder.Property(e => e.Price)
                 .IsRequired()
                 .HasColumnType("money");
-
-            builder.HasOne(e => e.Subject)
-                .WithMany()
-                .HasForeignKey(e => e.Id);
-
-            builder.HasMany(e => e.Bookings)
-                .WithOne(e => e.ExtraClass)
-                .HasForeignKey(e => e.Id);
         }
     }
 }

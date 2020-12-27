@@ -1,14 +1,14 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
 using CrouseMath.Application.Bookings.Commands.CreateBooking;
 using CrouseMath.Application.Common.Exceptions;
-using CrouseMath.Application.IntegrationTests;
+using CrouseMath.Application.ExtraClasses.Commands.CreateExtraClass;
+using CrouseMath.Application.Subjects.Commands.CreateSubject;
 using CrouseMath.Domain.Entities;
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace CrouseMath.Application.UnitTests.Bookings.Commands.CreateBooking
+namespace CrouseMath.Application.IntegrationTests.Bookings.Commands.CreateBooking
 {
     using static Testing;
 
@@ -19,25 +19,27 @@ namespace CrouseMath.Application.UnitTests.Bookings.Commands.CreateBooking
         {
             // Arrange
             var userId = await RunAsDefaultUserAsync();
-
-            await AddAsync(new ExtraClass
+            var subjectId = await SendAsync(new CreateSubjectCommand { Name = "Wizardry" });
+            var extraClassId = await SendAsync(new CreateExtraClassCommand
             {
                 Name = "Gandalf's class",
+                SubjectId = subjectId,
                 Size = 1,
                 Price = 500,
                 Duration = TimeSpan.FromMinutes(60),
                 Date = DateTime.Now,
-                IsClassFull = false
             });
 
-            var command = new CreateBookingCommand { ExtraClassId = 1 };
+            var command = new CreateBookingCommand { ExtraClassId = extraClassId };
 
             var bookingId = await SendAsync(command);
 
             var booking = await FindAsync<Booking>(bookingId);
 
             booking.UserId.Should().Be(userId);
-            booking.ExtraClassId.Should().Be(1);
+            booking.ExtraClassId.Should().Be(extraClassId);
+            booking.CreatedBy.Should().Be(userId);
+            booking.Created.Should().BeCloseTo(DateTime.Now, 10000);
         }
 
         [Test]
@@ -54,22 +56,25 @@ namespace CrouseMath.Application.UnitTests.Bookings.Commands.CreateBooking
         public async Task CreateBookingCommandHandler_ShouldThrowClassIsFullException()
         {
             // Arrange
-            await AddAsync(new ExtraClass
+            var userId = await RunAsDefaultUserAsync();
+            var subjectId = await SendAsync(new CreateSubjectCommand { Name = "Wizardry" });
+            var extraClassId = await SendAsync(new CreateExtraClassCommand
             {
                 Name = "Gandalf's class",
+                SubjectId = subjectId,
                 Size = 1,
                 Price = 500,
                 Duration = TimeSpan.FromMinutes(60),
                 Date = DateTime.Now,
-                IsClassFull = true
             });
 
-            var command = new CreateBookingCommand { ExtraClassId = 1 };
+            await SendAsync(new CreateBookingCommand { ExtraClassId = extraClassId });
+            await RunAsUserAsync("student@local", "Student1234!");
+            var command = new CreateBookingCommand { ExtraClassId = extraClassId };
 
             // Assert
-
             FluentActions.Invoking(() =>
-                SendAsync(command)).Should().ThrowExactly<ClassIsFullException>();
+                SendAsync(command)).Should().Throw<ClassIsFullException>();
         }
 
         [Test]
@@ -77,18 +82,18 @@ namespace CrouseMath.Application.UnitTests.Bookings.Commands.CreateBooking
         {
             // Arrange
             var userId = await RunAsDefaultUserAsync();
-
-            await AddAsync(new ExtraClass
+            var subjectId = await SendAsync(new CreateSubjectCommand { Name = "Wizardry" });
+            var extraClassId = await SendAsync(new CreateExtraClassCommand
             {
                 Name = "Gandalf's class",
+                SubjectId = subjectId,
                 Size = 5,
                 Price = 500,
                 Duration = TimeSpan.FromMinutes(60),
                 Date = DateTime.Now,
-                IsClassFull = false
             });
 
-            var command = new CreateBookingCommand { ExtraClassId = 1 };
+            var command = new CreateBookingCommand { ExtraClassId = extraClassId };
 
             var bookingId = await SendAsync(command);
 

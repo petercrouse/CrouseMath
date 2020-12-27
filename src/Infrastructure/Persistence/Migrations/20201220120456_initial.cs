@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace CrouseMath.Infrastructure.Persistence.Migrations
 {
-    public partial class extraclasses : Migration
+    public partial class initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -81,25 +81,6 @@ namespace CrouseMath.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Student",
-                columns: table => new
-                {
-                    Id = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    CreatedBy = table.Column<string>(nullable: true),
-                    Created = table.Column<DateTime>(nullable: false),
-                    LastModifiedBy = table.Column<string>(nullable: true),
-                    LastModified = table.Column<DateTime>(nullable: true),
-                    LastName = table.Column<string>(maxLength: 20, nullable: false),
-                    FirstName = table.Column<string>(maxLength: 20, nullable: false),
-                    Email = table.Column<string>(maxLength: 50, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Student", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Subject",
                 columns: table => new
                 {
@@ -114,25 +95,6 @@ namespace CrouseMath.Infrastructure.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Subject", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Teacher",
-                columns: table => new
-                {
-                    Id = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    CreatedBy = table.Column<string>(nullable: true),
-                    Created = table.Column<DateTime>(nullable: false),
-                    LastModifiedBy = table.Column<string>(nullable: true),
-                    LastModified = table.Column<DateTime>(nullable: true),
-                    LastName = table.Column<string>(nullable: true),
-                    FirstName = table.Column<string>(nullable: true),
-                    Email = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Teacher", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -245,57 +207,28 @@ namespace CrouseMath.Infrastructure.Persistence.Migrations
                 name: "ExtraClass",
                 columns: table => new
                 {
-                    Id = table.Column<long>(nullable: false),
+                    Id = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     CreatedBy = table.Column<string>(nullable: true),
                     Created = table.Column<DateTime>(nullable: false),
                     LastModifiedBy = table.Column<string>(nullable: true),
                     LastModified = table.Column<DateTime>(nullable: true),
                     Name = table.Column<string>(maxLength: 30, nullable: false),
                     Date = table.Column<DateTime>(type: "datetime", nullable: false),
-                    TeacherId = table.Column<long>(nullable: true),
                     Size = table.Column<int>(nullable: false),
                     IsClassFull = table.Column<bool>(nullable: false),
                     Duration = table.Column<TimeSpan>(type: "time(7)", nullable: false),
                     SubjectId = table.Column<long>(nullable: false),
-                    Price = table.Column<decimal>(type: "money", nullable: false)
+                    Price = table.Column<decimal>(type: "money", nullable: false),
+                    TeacherId = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ExtraClass", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ExtraClass_Subject_Id",
-                        column: x => x.Id,
-                        principalTable: "Subject",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ExtraClass_Teacher_TeacherId",
-                        column: x => x.TeacherId,
-                        principalTable: "Teacher",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "TeacherSubject",
-                columns: table => new
-                {
-                    TeacherId = table.Column<long>(nullable: false),
-                    SubjectId = table.Column<long>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TeacherSubject", x => new { x.TeacherId, x.SubjectId });
-                    table.ForeignKey(
-                        name: "FK_TeacherSubject_Subject_SubjectId",
+                        name: "FK_ExtraClass_Subject_SubjectId",
                         column: x => x.SubjectId,
                         principalTable: "Subject",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_TeacherSubject_Teacher_TeacherId",
-                        column: x => x.TeacherId,
-                        principalTable: "Teacher",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -304,13 +237,14 @@ namespace CrouseMath.Infrastructure.Persistence.Migrations
                 name: "Booking",
                 columns: table => new
                 {
-                    Id = table.Column<long>(nullable: false),
+                    Id = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     CreatedBy = table.Column<string>(nullable: true),
                     Created = table.Column<DateTime>(nullable: false),
                     LastModifiedBy = table.Column<string>(nullable: true),
                     LastModified = table.Column<DateTime>(nullable: true),
                     ExtraClassId = table.Column<long>(nullable: false),
-                    StudentId = table.Column<long>(nullable: false),
+                    UserId = table.Column<string>(nullable: true),
                     BookingPrice = table.Column<decimal>(type: "money", nullable: false),
                     Paid = table.Column<bool>(nullable: false)
                 },
@@ -318,15 +252,9 @@ namespace CrouseMath.Infrastructure.Persistence.Migrations
                 {
                     table.PrimaryKey("PK_Booking", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Booking_ExtraClass_Id",
-                        column: x => x.Id,
+                        name: "FK_Booking_ExtraClass_ExtraClassId",
+                        column: x => x.ExtraClassId,
                         principalTable: "ExtraClass",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Booking_Student_Id",
-                        column: x => x.Id,
-                        principalTable: "Student",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -371,6 +299,11 @@ namespace CrouseMath.Infrastructure.Persistence.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Booking_ExtraClassId",
+                table: "Booking",
+                column: "ExtraClassId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_DeviceCodes_DeviceCode",
                 table: "DeviceCodes",
                 column: "DeviceCode",
@@ -382,9 +315,9 @@ namespace CrouseMath.Infrastructure.Persistence.Migrations
                 column: "Expiration");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ExtraClass_TeacherId",
+                name: "IX_ExtraClass_SubjectId",
                 table: "ExtraClass",
-                column: "TeacherId");
+                column: "SubjectId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PersistedGrants_Expiration",
@@ -395,11 +328,6 @@ namespace CrouseMath.Infrastructure.Persistence.Migrations
                 name: "IX_PersistedGrants_SubjectId_ClientId_Type",
                 table: "PersistedGrants",
                 columns: new[] { "SubjectId", "ClientId", "Type" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_TeacherSubject_SubjectId",
-                table: "TeacherSubject",
-                column: "SubjectId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -429,9 +357,6 @@ namespace CrouseMath.Infrastructure.Persistence.Migrations
                 name: "PersistedGrants");
 
             migrationBuilder.DropTable(
-                name: "TeacherSubject");
-
-            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
@@ -441,13 +366,7 @@ namespace CrouseMath.Infrastructure.Persistence.Migrations
                 name: "ExtraClass");
 
             migrationBuilder.DropTable(
-                name: "Student");
-
-            migrationBuilder.DropTable(
                 name: "Subject");
-
-            migrationBuilder.DropTable(
-                name: "Teacher");
         }
     }
 }

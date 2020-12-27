@@ -5,6 +5,7 @@ using CrouseMath.Application.Common.Exceptions;
 using CrouseMath.Application.Common.Interfaces;
 using CrouseMath.Domain.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace CrouseMath.Application.Bookings.Commands.CreateBooking
 {
@@ -26,7 +27,9 @@ namespace CrouseMath.Application.Bookings.Commands.CreateBooking
 
         public async Task<long> Handle(CreateBookingCommand request, CancellationToken cancellationToken)
         {
-            var entity = await _context.ExtraClasses.FindAsync(request.ExtraClassId, cancellationToken);
+            var entity = await _context.ExtraClasses.Where(x => x.Id == request.ExtraClassId)
+                .Include(b => b.Bookings)
+                .SingleOrDefaultAsync();
 
             if (entity == null)
             {

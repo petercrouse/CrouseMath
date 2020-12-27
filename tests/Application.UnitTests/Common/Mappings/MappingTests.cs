@@ -1,6 +1,13 @@
 ﻿using AutoMapper;
+using CrouseMath.Application.Bookings.Queries.GetBooking;
+using CrouseMath.Application.Bookings.Queries.GetBookingList;
 using CrouseMath.Application.Common.Mappings;
+using CrouseMath.Application.ExtraClasses.Queries.GetExtraClass;
+using CrouseMath.Application.ExtraClasses.Queries.GetExtraClassList;
+using CrouseMath.Domain.Entities;
 using NUnit.Framework;
+using System;
+using System.Runtime.Serialization;
 
 namespace CrouseMath.Application.UnitTests.Common.Mappings
 {
@@ -23,6 +30,27 @@ namespace CrouseMath.Application.UnitTests.Common.Mappings
         public void ShouldHaveValidConfiguration()
         {
             _configuration.AssertConfigurationIsValid();
+        }
+
+        [Test]
+        [TestCase(typeof(Booking), typeof(BookingDto))]
+        [TestCase(typeof(Booking), typeof(BookingLookupDto))]
+        [TestCase(typeof(ExtraClass), typeof(ExtraClassDto))]
+        [TestCase(typeof(ExtraClass), typeof(ExtraClassLookupDto))]
+        public void ShouldSupportMappingFromSourceToDestination(Type source, Type destination)
+        {
+            var instance = GetInstanceOf(source);
+
+            _mapper.Map(instance, source, destination);
+        }
+
+        private object GetInstanceOf(Type type)
+        {
+            if (type.GetConstructor(Type.EmptyTypes) != null)
+                return Activator.CreateInstance(type);
+
+            // Type without parameterless constructor
+            return FormatterServices.GetUninitializedObject(type);
         }
     }
 }

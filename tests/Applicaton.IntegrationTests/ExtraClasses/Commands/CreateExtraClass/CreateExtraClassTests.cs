@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
 using CrouseMath.Application.Common.Exceptions;
 using CrouseMath.Application.ExtraClasses.Commands.CreateExtraClass;
-using CrouseMath.Application.IntegrationTests;
+using CrouseMath.Application.Subjects.Commands.CreateSubject;
 using CrouseMath.Domain.Entities;
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace CrouseMath.Application.UnitTests.ExtraClasses.Commands.CreateExtraClass
+namespace CrouseMath.Application.IntegrationTests.ExtraClasses.Commands.CreateExtraClass
 {
     using static Testing;
 
@@ -19,14 +18,12 @@ namespace CrouseMath.Application.UnitTests.ExtraClasses.Commands.CreateExtraClas
         {
             // Arrange
             var userId = await RunAsDefaultUserAsync();
-
-            await AddAsync(new Subject { Name = "Staff Logic" });
+            var subjectId = await SendAsync(new CreateSubjectCommand { Name = "Wizardry" });
 
             var name = "Staff logic training";
             var date = new DateTime(2056, 1, 1);
             var duration = new TimeSpan(1, 0, 0);
             var size = 10;
-            var subjectId = 1;
             var price = 100;
            
             var command = new CreateExtraClassCommand

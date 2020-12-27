@@ -1,9 +1,11 @@
-﻿using System.Threading;
+﻿using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using CrouseMath.Application.Common.Exceptions;
 using CrouseMath.Application.Common.Interfaces;
 using CrouseMath.Domain.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace CrouseMath.Application.Bookings.Commands.DeleteBooking
 {
@@ -23,7 +25,9 @@ namespace CrouseMath.Application.Bookings.Commands.DeleteBooking
 
         public async Task<Unit> Handle(DeleteBookingCommand request, CancellationToken cancellationToken)
         {
-            var entity = await _context.Bookings.FindAsync(request.Id, cancellationToken);
+            var entity = await _context.Bookings.Where(x => x.Id == request.Id)
+                .Include(e => e.ExtraClass)
+                .SingleOrDefaultAsync();
 
             if(entity == null)
             {

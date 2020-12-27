@@ -9,7 +9,7 @@ namespace CrouseMath.Application.ExtraClasses.Commands.CreateExtraClass
         public CreateExtraClassCommandValidator(IDateTime dateTime)
         {
             RuleFor(x => x.Name).NotEmpty();
-            RuleFor(x => x.Date).GreaterThanOrEqualTo(dateTime.Now);
+            RuleFor(x => x.Date).GreaterThanOrEqualTo(dateTime.Now.AddMinutes(-30));
             RuleFor(x => x.Duration).GreaterThanOrEqualTo(new TimeSpan(0, 30, 0));
             RuleFor(x => x.Price).GreaterThanOrEqualTo(0);
             RuleFor(x => x.SubjectId).GreaterThan(0);
