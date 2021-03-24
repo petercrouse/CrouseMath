@@ -27,15 +27,19 @@ namespace CrouseMath.Infrastructure.Persistence
             {
                 context.Subjects.AddRange(new[]
                 {
-                    new Subject {Name = "Magic"},
-                    new Subject {Name = "Staff Logic"}
+                    new Subject {Name = "Algebra"},
+                    new Subject {Name = "Geometry"}
                 });
+
+                await context.SaveChangesAsync();
+
+                var subject = context.Subjects.Where(x => x.Name == "Algebra").SingleOrDefault();
 
                 context.ExtraClasses.Add(new ExtraClass
                 {
-                    Name = "Math Algebra",
+                    Name = "Math",
                     Size = 5,
-                    SubjectId = 1,
+                    SubjectId = subject.Id,
                     Date = DateTime.Now,
                     Duration = new TimeSpan(1, 0, 0),
                     IsClassFull = false,

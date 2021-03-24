@@ -32,6 +32,7 @@ namespace CrouseMath.Application.ExtraClasses.Queries.GetExtraClass
             CancellationToken cancellationToken)
         {
             var entity = await _context.ExtraClasses.Where(x => x.Id == request.Id)
+                .Include(x => x.Subject)
                 .SingleOrDefaultAsync(cancellationToken);
 
             if (entity == null)
@@ -40,7 +41,11 @@ namespace CrouseMath.Application.ExtraClasses.Queries.GetExtraClass
             }
 
             var extraClass = _mapper.Map<ExtraClassDto>(entity);
-            extraClass.TeacherName = await _identityService.GetUserNameAsync(extraClass.TeacherId);
+
+            if(extraClass.TeacherId != null)
+            {
+                extraClass.TeacherName = await _identityService.GetUserNameAsync(extraClass.TeacherId);
+            }
 
             return new ExtraClassViewModel
             {

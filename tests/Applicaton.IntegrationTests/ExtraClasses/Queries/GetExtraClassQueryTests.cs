@@ -24,7 +24,8 @@ namespace CrouseMath.Application.IntegrationTests.ExtraClasses.Queries
 
             var teacherId = await RunAsUserAsync("teacher@local", "Teacher1234!");
 
-            var subjectId = await SendAsync(new CreateSubjectCommand { Name = "StaffLogic" });
+            var subjectName = "StaffLogic";
+            var subjectId = await SendAsync(new CreateSubjectCommand { Name = subjectName });
             var extraClassId = await SendAsync(new CreateExtraClassCommand
             {
                 SubjectId = subjectId,
@@ -43,6 +44,7 @@ namespace CrouseMath.Application.IntegrationTests.ExtraClasses.Queries
             result.ExtraClass.Id.Should().Be(extraClassId);
             result.ExtraClass.Name.Should().Be(name);
             result.ExtraClass.TeacherId.Should().Be(teacherId);
+            result.ExtraClass.SubjectName.Should().Be(subjectName);
         }
     }
 }
