@@ -29,7 +29,7 @@ namespace CrouseMath.Application.Bookings.Commands.CreateBooking
         {
             var entity = await _context.ExtraClasses.Where(x => x.Id == request.ExtraClassId)
                 .Include(b => b.Bookings)
-                .SingleOrDefaultAsync();
+                .SingleOrDefaultAsync(cancellationToken);
 
             if (entity == null)
             {
